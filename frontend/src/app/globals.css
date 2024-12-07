@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+
+.swiper-pagination{
+  display: none !important;
+}
+
+.swiper-button-next{
+  color: rgba(167, 167, 167, 0.571) !important;
+  margin-right: -12px !important;
+}
+
+.swiper-button-prev{
+  color: rgba(167, 167, 167, 0.571) !important;
+  margin-left: -12px !important;
+}
