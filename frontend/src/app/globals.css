@@ -27,3 +27,7 @@ body {
   color: rgba(167, 167, 167, 0.571) !important;
   margin-left: -12px !important;
 }
+
+.CardHover:hover .TextCardHover{
+  text-decoration: underline;
+}
