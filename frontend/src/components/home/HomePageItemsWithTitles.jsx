@@ -7,7 +7,7 @@ export default function HomePageItemsWithTitles() {
             
 
 
-            <p className="text-2xl -mb-4 z-50 relative font-semibold mt-14 ml-36">New & Trending</p>
+            <p className="text-2xl -mb-4 relative font-semibold mt-14 ml-36">New & Trending</p>
             <div className="grid grid-cols-3 mx-20">
                 <div className="col-span-3 mx-2 md:col-span-1">
                     <div className="w-full cursor-pointer">
@@ -49,7 +49,7 @@ export default function HomePageItemsWithTitles() {
             </div>
 
 
-            <p className="text-2xl -mb-4 z-50 relative font-semibold mt-14 ml-36">Pre-Order (Coming soon) <span className="ml-2 font-medium text-sm hover:no-underline cursor-pointer underline">Shop All</span></p>
+            <p className="text-2xl -mb-4 relative font-semibold mt-14 ml-36">Pre-Order (Coming soon) <span className="ml-2 font-medium text-sm hover:no-underline cursor-pointer underline">Shop All</span></p>
             <div className="grid grid-cols-3 mx-20">
                 <div className="col-span-3 mx-2 md:col-span-1">
                     <div className="w-full cursor-pointer">

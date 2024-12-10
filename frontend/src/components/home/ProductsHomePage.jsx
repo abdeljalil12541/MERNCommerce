@@ -8,7 +8,7 @@ export default function ProductsHomePage() {
                 FREE SHIPPING WITH A PURCHASE OF 3 OR MORE PRODUCTS + FREE MERCH BAG
             </p>
 
-            <p className="text-2xl -mb-4 z-50 relative font-semibold mt-2 ml-36">All products(15)</p>
+            <p className="text-2xl -mb-4 relative font-semibold mt-2 ml-36">All products(15)</p>
             <div className="grid grid-cols-3 mx-20">
                 <div className="col-span-3 mx-2 md:col-span-1">
                     <div className="w-full cursor-pointer">
