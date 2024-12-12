@@ -44,3 +44,41 @@ body {
 .CardHover:hover .TextCardHover{
   text-decoration: underline;
 }
+
+.overflow-x-scroll{
+  overflow-x: auto !important;
+}
+
+.outline-none {
+  outline: 0px solid transparent !important;
+  outline-offset: 0px !important;
+}
+
+.border-medium {
+  border-width: 1px !important;
+}
+.bg-primary {
+  --tw-bg-opacity: 1;
+  background-color: #E74683;
+}
+
+.shadow-primary\/40 {
+    --tw-shadow-color: none !important; /* Set your custom color */
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color / 0.4);
+    box-shadow: var(--tw-shadow);
+  
+}
+
+.text-default-foreground {
+  color: #E74683 !important;
+}
+
+[data-disabled="true"] {
+  color: #787878 !important; /* Change text color */
+  pointer-events: none; /* Disable clicking or interaction */
+}
+
+.border-default {
+  --tw-border-opacity: 1;
+  border-color: #e7468463 !important;
+}

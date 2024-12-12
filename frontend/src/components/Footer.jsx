@@ -51,7 +51,7 @@ export default function Footer() {
 
                     {/* Newsletter */}
                     <div className="space-y-4">
-                        <h3 className="text-white font-bold text-xl">SUBSCRIBE FOR <span className="text-[#ff481f]">NEWSLETTER</span></h3>
+                        <h3 className="text-white font-bold text-xl">SUBSCRIBE FOR <span className="text-[#E74683]">NEWSLETTER</span></h3>
                         <div className="flex">
                             <input 
                                 type="email" 

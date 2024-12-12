@@ -43,7 +43,7 @@ export default function HomePageItemsWithTitles() {
                 </div>
             </div>
             <div className="w-full flex justify-center">
-                <Button className="mt-8 ml-3 bg-neutral-950 !transition !duration-300 text-gray-200">
+                <Button color="primary" variant="bordered">
                     View More <MoveRight size={18} />
                 </Button>
             </div>

@@ -149,7 +149,7 @@ export default function Header() {
       <NavbarItem className="bg-[#17C964] py-[2px] text-white px-3 rounded-full">
         <Link 
             href="news"
-            className="text-sm font-medium no-underline relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:scale-x-0 hover:after:scale-x-100 after:transition-transform hover:opacity-100 active:opacity-100 transition-none after:duration-300"
+            className="text-sm font-medium no-underline text-white relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:scale-x-0 hover:after:scale-x-100 after:transition-transform hover:opacity-100 active:opacity-100 transition-none after:duration-300"
         >
           NEW
         </Link>
@@ -159,7 +159,7 @@ export default function Header() {
           <NavbarItem key={link.name}>
             <Link 
               href={link.href}
-              className="text-sm font-medium no-underline relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#E74683] after:scale-x-0 hover:after:scale-x-100 after:transition-transform hover:opacity-100 active:opacity-100 transition-none after:duration-300"
+              className="text-sm text-dark font-medium no-underline relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#E74683] after:scale-x-0 hover:after:scale-x-100 after:transition-transform hover:opacity-100 active:opacity-100 transition-none after:duration-300"
             >
               {link.name}
             </Link>
