@@ -127,9 +127,25 @@ export default function Header() {
   
   const currencyOptions = [
     { country: "United States", currency: "USD" },
-    { country: "France", currency: "EUR" },
-    { country: "Morocco", currency: "MAD" }
+    { country: "Morocco", currency: "MAD" },
+    { country: "France", currency: "EUR" }
   ];
+
+  const currencyDropDownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if click is outside filter section
+      if (currencyDropDownRef.current && !currencyDropDownRef.current.contains(event.target)) {
+        setOpenCurrencyDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []); // Add openDropdown as dependency
 
   return (
     <>
@@ -170,7 +186,7 @@ export default function Header() {
       <NavbarContent className="ml-32">
         <div className="flex items-center gap-4">
           {/* Currency Selector */}
-          <div className="relative flex">
+          <div ref={currencyDropDownRef} className="relative flex">
             <div className="flex items-center gap-2">
               <FaMapMarkerAlt className="-mt-[4px] w-4 h-4" />
               <button
