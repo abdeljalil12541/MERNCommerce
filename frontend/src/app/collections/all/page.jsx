@@ -1,9 +1,11 @@
 "use client";
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import {Pagination} from "@nextui-org/react";
+import {Button, Pagination} from "@nextui-org/react";
+import Loader from '@/components/Loader';
 
 const All = () => {
+    const [loader, setLoader] = useState(false);
     const [openDropdown, setOpenDropdown] = useState(null);
     const [selectedSort, setSelectedSort] = useState('Featured');
     const [selectedFilters, setSelectedFilters] = useState({
@@ -212,7 +214,7 @@ const All = () => {
                                     type="checkbox"
                                     checked={selectedFilters[filter].includes(option.name)}
                                     onChange={() => toggleFilter(filter, option.name)}
-                                    className="mr-2 rounded border-gray-300"
+                                    className="mr-2 rounded border-gray-300 accent-pink-500"
                                     />
                                     <span>{option.name}</span>
                                 </div>
@@ -230,7 +232,7 @@ const All = () => {
                                     type="checkbox"
                                     checked={selectedFilters[filter].includes(option)}
                                     onChange={() => toggleFilter(filter, option)}
-                                    className="mr-2 rounded border-gray-300"
+                                    className="mr-2 rounded border-gray-300 accent-pink-500"
                                 />
                                 {option}
                                 </label>
@@ -275,47 +277,51 @@ const All = () => {
                         </div>
                     )}
                     </div>
-                    <span className="text-sm text-gray-500 ml-4">39 products</span>
+                    <span className="text-sm text-gray-500 ml-4">{filteredProducts.length} products</span>
                 </div>
               </div>
           </div>
 
+          {currentPageProducts.length === 0 ? (
+            <div className='w-full container mx-auto text-center mt-4'>No products match the selected filters.</div>
+          ) : (
+            ''
+          )}
+
           <div className="w-full px-4 grid grid-cols-4 mb-5">
-          {currentPageProducts.length > 0 ? (
-            currentPageProducts.map((product, index) => (
-              <div key={index} className="col-span-1 CardHover relative mx-1 cursor-pointer h-[480px] group">
-                  <img
-                      src={product.mainSrc}
-                      alt={product.title}
-                      className="rounded-lg group-hover:hidden h-[400px] w-full object-cover"
-                  />
-                  <img
-                      src={product.hoverSrc}
-                      alt={`${product.title} Hover`}
-                      className="rounded-lg hidden group-hover:block h-[400px] w-full object-cover"
-                  />
-                  <span 
-                      className={`absolute ${product.status === 'SOLD OUT'? '!bottom-[90px] right-2': 'top-2 left-2'} 
-                          ${product.status === 'NEW' && 'bg-[#1AACDD]' ||
-                              product.status === 'DEAL' && 'bg-[#E74683]' ||
-                              product.status === 'TRENDING' && 'bg-[#17C964]' ||
-                              product.status === 'SOLD OUT' && 'bg-neutral-950'
-                          } text-white text-[10px] me-2 px-4 py-1 rounded-xl font-semibold`}
-                      >
-                      {product.status}
-                  </span>
-                  <div className="space-y-2 p-2">
-                      <p className="pt-2 cursor-pointer TextCardHover">{product.title}</p>
-                      <div className="flex gap-3">
-                          <p className="text-gray-800 line-through">{product.regularPrice.toFixed(2)} dh</p>
-                          <p className="text-black font-semibold">{product.currentPrice.toFixed(2)} dh</p>
-                          <p className="text-[#E74683] font-semibold text-sm mt-[1px]">{product.discount}% OFF</p>
-                      </div>
-                  </div>
-              </div>
-            ))
-            ) : (
-              <p>No products match the selected filters.</p>
+            {currentPageProducts.length > 0 && (
+              currentPageProducts.map((product, index) => (
+                <div key={index} className="col-span-1 CardHover relative mx-1 cursor-pointer h-[480px] group">
+                    <img
+                        src={product.mainSrc}
+                        alt={product.title}
+                        className="rounded-lg group-hover:hidden h-[400px] w-full object-cover"
+                    />
+                    <img
+                        src={product.hoverSrc}
+                        alt={`${product.title} Hover`}
+                        className="rounded-lg hidden group-hover:block h-[400px] w-full object-cover"
+                    />
+                    <span 
+                        className={`absolute ${product.status === 'SOLD OUT'? '!bottom-[90px] right-2': 'top-2 left-2'} 
+                            ${product.status === 'NEW' && 'bg-[#1AACDD]' ||
+                                product.status === 'DEAL' && 'bg-[#E74683]' ||
+                                product.status === 'TRENDING' && 'bg-[#17C964]' ||
+                                product.status === 'SOLD OUT' && 'bg-neutral-950'
+                            } text-white text-[10px] me-2 px-4 py-1 rounded-xl font-semibold`}
+                        >
+                        {product.status}
+                    </span>
+                    <div className="space-y-2 p-2">
+                        <p className="pt-2 cursor-pointer TextCardHover">{product.title}</p>
+                        <div className="flex gap-3">
+                            <p className="text-gray-800 line-through">{product.regularPrice.toFixed(2)} dh</p>
+                            <p className="text-black font-semibold">{product.currentPrice.toFixed(2)} dh</p>
+                            <p className="text-[#E74683] font-semibold text-sm mt-[1px]">{product.discount}% OFF</p>
+                        </div>
+                    </div>
+                </div>
+              ))
             )}
           </div>
 
@@ -330,6 +336,8 @@ const All = () => {
               onChange={handlePagination}
             />
           </div>
+
+        {loader && <Loader />}   
       </div>
     );
 };

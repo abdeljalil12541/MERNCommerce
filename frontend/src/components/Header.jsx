@@ -68,7 +68,7 @@ export default function Header() {
           placeholder="Search"
           className="w-full pl-8 pr-8 py-2 outline-none"
         />
-          <GoSearch className="h-5 cursor-pointer w-5 absolute left-2 text-gray-500" />
+          <GoSearch onClick={handleSearchClick} className="h-5 cursor-pointer w-5 absolute left-2 text-gray-500" />
         <button className="absolute right-2 text-gray-500 hover:text-black">
           <X onClick={handleClearSearch} strokeWidth={1.25} />
         </button>
@@ -93,7 +93,7 @@ export default function Header() {
       </div>
 
       <div className="w-full flex justify-center text-gray-600">
-        <button className="border border-gray-600 uppercase px-14 py-2 rounded-full mt-36">continue shopping</button>
+        <Button className="uppercase px-10 py-2 rounded-full mt-36 text-gray-500 text-[17px] border-gray-400" variant="bordered">continue shopping</Button>
       </div>
     </div>
   );
@@ -146,12 +146,22 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []); // Add openDropdown as dependency
+  
+  const [searchVal, setSearchVal] = useState("");
+  function handleSearchClick() {
+    if (searchVal === "") { setProducts(productList); return; }
+    const filterBySearch = productList.filter((item) => {
+        if (item.toLowerCase()
+            .includes(searchVal.toLowerCase())) { return item; }
+    })
+    setProducts(filterBySearch);
+  }
 
   return (
     <>
-    <div className="bg-[#E74683] w-full  flex justify-center items-center text-white font-semibold py-2">The ONLY Official MrBeast Merch Store</div>
+    <div style={{zIndex: '999'}} className="bg-[#E74683] relative w-full flex justify-center items-center text-white font-semibold py-2">The ONLY Official MrBeast Merch Store</div>
 
-    <Navbar className="bg-white flex justify-between text-black py-4 font-semibold" onMenuOpenChange={setIsMenuOpen}>
+    <Navbar className="bg-white z-[999] flex justify-between text-black py-4 font-semibold" onMenuOpenChange={setIsMenuOpen}>
     <NavbarContent className="">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
