@@ -2,7 +2,13 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { Goldman } from 'next/font/google';
 
+
+const GoldmanFont = Goldman({
+    subsets: ['latin'],
+    weight: ['400'],
+});
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -23,7 +29,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} ${GoldmanFont.className} antialiased`}
         >
           <Header />
           <main>{children}</main>

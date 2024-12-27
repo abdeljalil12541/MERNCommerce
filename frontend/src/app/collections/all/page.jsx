@@ -3,6 +3,13 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import {Button, Pagination} from "@nextui-org/react";
 import Loader from '@/components/Loader';
+import { Goldman } from 'next/font/google';
+
+
+const GoldmanFont = Goldman({
+    subsets: ['latin'],
+    weight: ['400'],
+});
 
 const All = () => {
     const [loader, setLoader] = useState(false);
@@ -170,10 +177,10 @@ const All = () => {
     
 
     return (
-      <div className="w-full bg-white">
+      <div className="w-full bg-white px-2">
           <div className="mx-auto px-6 py-4">
               <div className="flex items-center justify-between">
-                <div ref={filterRef} className="flex items-center gap-4">
+                <div ref={filterRef} className={`${GoldmanFont.className} text-gray-500 flex items-center gap-4`}>
                     <span className="text-sm font-medium">Filter:</span>
                     
                     {/* Filter Dropdowns */}
@@ -184,7 +191,7 @@ const All = () => {
                         className="flex items-center gap-2 text-sm capitalize hover:text-gray-600"
                         >
                         {filter === 'productType' ? 'Product type' : filter}
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
+                        <ChevronDown className={`w-4 h-4 mt-1 transition-transform duration-200 ${
                             openDropdown === filter ? 'rotate-180' : ''
                         }`} />
                         </button>
@@ -204,29 +211,29 @@ const All = () => {
                             </div>
                             {filter === 'productType' ? (
                             // Product type options with counts
-                            options.map((option) => (
+                              options.map((option) => (
                                 <label
                                 key={option.name}
-                                className="flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
+                                className="flex items-center group justify-between px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
                                 >
-                                <div className="flex items-center">
+                                <div className="group-hover:text-gray-800 flex items-center">
                                     <input
-                                    type="checkbox"
-                                    checked={selectedFilters[filter].includes(option.name)}
-                                    onChange={() => toggleFilter(filter, option.name)}
-                                    className="mr-2 rounded border-gray-300 accent-pink-500"
+                                      type="checkbox"
+                                      checked={selectedFilters[filter].includes(option.name)}
+                                      onChange={() => toggleFilter(filter, option.name)}
+                                      className="mr-2 rounded border-gray-300 accent-pink-500"
                                     />
                                     <span>{option.name}</span>
                                 </div>
                                 <span className="text-gray-500">({option.count})</span>
                                 </label>
-                            ))
+                              ))
                             ) : (
                             // Regular options without counts
                             options.map((option) => (
                                 <label
                                 key={option}
-                                className="flex items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
+                                className="flex group items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
                                 >
                                 <input
                                     type="checkbox"
@@ -234,7 +241,7 @@ const All = () => {
                                     onChange={() => toggleFilter(filter, option)}
                                     className="mr-2 rounded border-gray-300 accent-pink-500"
                                 />
-                                {option}
+                                <span className='group-hover:text-gray-800'>{option}</span>
                                 </label>
                             ))
                             )}
@@ -245,7 +252,7 @@ const All = () => {
                 </div>
 
                 {/* Sort Section */}
-                <div  ref={sortRef} className="flex items-center gap-2">
+                <div ref={sortRef} className={`${GoldmanFont.className} text-gray-500 flex items-center gap-2`}>
                     <span className="text-sm">Sort by:</span>
                     <div className="relative">
                     <button
@@ -271,7 +278,7 @@ const All = () => {
                                 selectedSort === option ? 'bg-gray-50' : ''
                             }`}
                             >
-                            {option}
+                            <span className='hover:text-gray-800'>{option}</span>
                             </button>
                         ))}
                         </div>
@@ -291,7 +298,7 @@ const All = () => {
           <div className="w-full px-4 grid grid-cols-4 mb-5">
             {currentPageProducts.length > 0 && (
               currentPageProducts.map((product, index) => (
-                <div key={index} className="col-span-1 CardHover relative mx-1 cursor-pointer h-[480px] group">
+                <div key={index} className={`${GoldmanFont.className} col-span-1 CardHover relative mx-1 cursor-pointer h-[480px] group`}>
                     <img
                         src={product.mainSrc}
                         alt={product.title}
@@ -308,7 +315,7 @@ const All = () => {
                                 product.status === 'DEAL' && 'bg-[#E74683]' ||
                                 product.status === 'TRENDING' && 'bg-[#17C964]' ||
                                 product.status === 'SOLD OUT' && 'bg-neutral-950'
-                            } text-white text-[10px] me-2 px-4 py-1 rounded-xl font-semibold`}
+                            } text-white text-[10px] me-2 px-4 py-1 rounded-xl font-medium`}
                         >
                         {product.status}
                     </span>
@@ -316,8 +323,8 @@ const All = () => {
                         <p className="pt-2 cursor-pointer TextCardHover">{product.title}</p>
                         <div className="flex gap-3">
                             <p className="text-gray-800 line-through">{product.regularPrice.toFixed(2)} dh</p>
-                            <p className="text-black font-semibold">{product.currentPrice.toFixed(2)} dh</p>
-                            <p className="text-[#E74683] font-semibold text-sm mt-[1px]">{product.discount}% OFF</p>
+                            <p className="text-black ">{product.currentPrice.toFixed(2)} dh</p>
+                            <p className="text-[#E74683] mt-[1px]">{product.discount}% OFF</p>
                         </div>
                     </div>
                 </div>
@@ -328,6 +335,7 @@ const All = () => {
           <div className="mb-9 flex flex-wrap justify-center w-full gap-4 items-center">
             <Pagination
               hidden={!isPaginationVisible}
+              className={`${GoldmanFont.className}`}
               initialPage={currentPage}
               showControls
               showShadow

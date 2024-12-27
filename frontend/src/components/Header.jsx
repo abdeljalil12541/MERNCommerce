@@ -5,7 +5,13 @@ import { SwipeableDrawer } from '@mui/material';
 import { FaMapMarkerAlt } from 'react-icons/fa';
 import { ChevronDown, X } from 'lucide-react';
 import { GoSearch } from "react-icons/go";
+import { Goldman } from 'next/font/google';
 
+
+const GoldmanFont = Goldman({
+    subsets: ['latin'],
+    weight: ['400'],
+});
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false); // State to manage drawer
@@ -162,7 +168,7 @@ export default function Header() {
     <div style={{zIndex: '999'}} className="bg-[#E74683] relative w-full flex justify-center items-center text-white font-semibold py-2">The ONLY Official MrBeast Merch Store</div>
 
     <Navbar className="bg-white z-[999] flex justify-between text-black py-4 font-semibold" onMenuOpenChange={setIsMenuOpen}>
-    <NavbarContent className="">
+      <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
@@ -171,21 +177,21 @@ export default function Header() {
           <img className="max-w-none" src="https://mrbeast.store/cdn/shop/files/mrbeaststore_logo_19e042b0-02a5-4a87-9185-9e89c3ed3095.png?v=1707751347&width=160" alt="Logo" />
         </NavbarBrand>
       </NavbarContent>
-      <NavbarContent className="hidden sm:flex gap-6" justify="center">
-      <NavbarItem className="bg-[#17C964] py-[2px] text-white px-3 rounded-full">
-        <Link 
-            href="news"
-            className="text-sm font-medium no-underline text-white relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-white after:scale-x-0 hover:after:scale-x-100 after:transition-transform hover:opacity-100 active:opacity-100 transition-none after:duration-300"
-        >
-          NEW
-        </Link>
-      </NavbarItem>
+      <NavbarContent className="hidden sm:flex gap-6 " justify="center">
+        <NavbarItem className="bg-[#17C964] hover:bg-[#40ff93] duration-300 py-[2px] text-white px-3 rounded-full">
+          <Link 
+              href="news"
+                className={`${GoldmanFont.className} text-[12px] text-dark font-medium no-underline hover:opacity-100 active:opacity-100 transition-none after:duration-300`}
+          >
+            NEW
+          </Link>
+        </NavbarItem>
 
         {navLinks.map((link) => (
           <NavbarItem key={link.name}>
             <Link 
               href={link.href}
-              className="text-sm text-dark font-medium no-underline relative after:absolute after:bottom-0 after:left-0 after:w-full after:h-0.5 after:bg-[#E74683] after:scale-x-0 hover:after:scale-x-100 after:transition-transform hover:opacity-100 active:opacity-100 transition-none after:duration-300"
+              className={`${GoldmanFont.className} text-[12px] text-dark font-medium no-underline relative after:absolute after:bottom-[1px] after:left-0 after:w-full after:h-[1px] after:bg-[#E74683] hover:text-[#E74683] after:scale-x-0 hover:after:scale-x-100 after:transition-transform hover:opacity-100 active:opacity-100 transition-none after:duration-300`}
             >
               {link.name}
             </Link>
@@ -197,7 +203,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           {/* Currency Selector */}
           <div ref={currencyDropDownRef} className="relative flex">
-            <div className="flex items-center gap-2">
+            <div className={`${GoldmanFont.className} tracking-wider flex items-center gap-2`}>
               <FaMapMarkerAlt className="-mt-[4px] w-4 h-4" />
               <button
                 onClick={toggleCurrencyDropdown}
@@ -227,7 +233,7 @@ export default function Header() {
                         : "text-gray-600"
                     }`}
                   >
-                    {option.country} ({option.currency})
+                    <span className={`${GoldmanFont.className}`}>{option.country} ({option.currency})</span>
                   </button>
                 ))}
               </div>
