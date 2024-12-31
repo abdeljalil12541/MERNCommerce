@@ -163,6 +163,23 @@ export default function Header() {
     setProducts(filterBySearch);
   }
 
+
+  const logo = "https://mrbeast.store/cdn/shop/files/mrbeaststore_logo_19e042b0-02a5-4a87-9185-9e89c3ed3095.png?v=1707751347&width=160";
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleScroll = () => {
+    if (window.scrollY > 20) {
+      setIsScrolled(true);
+    } else {
+      setIsScrolled(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <>
     <div style={{zIndex: '999'}} className="bg-[#E74683] relative w-full flex justify-center items-center text-white font-semibold py-2">The ONLY Official MrBeast Merch Store</div>
@@ -174,7 +191,13 @@ export default function Header() {
           className="sm:hidden"
         />
         <NavbarBrand>
-          <img className="max-w-none" src="https://mrbeast.store/cdn/shop/files/mrbeaststore_logo_19e042b0-02a5-4a87-9185-9e89c3ed3095.png?v=1707751347&width=160" alt="Logo" />
+          <img 
+            className={`max-w-none transition-all duration-300 ease-in-out ${
+              isScrolled ? 'h-[38px] mr-9' : 'h-[49px]'
+            }`}
+            src={logo} 
+            alt="Logo" 
+          />
         </NavbarBrand>
       </NavbarContent>
       <NavbarContent className="hidden sm:flex gap-6 " justify="center">

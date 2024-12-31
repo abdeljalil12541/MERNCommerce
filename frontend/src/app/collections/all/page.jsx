@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import {Button, Pagination} from "@nextui-org/react";
+import { Pagination } from "@nextui-org/react";
 import Loader from '@/components/Loader';
 import { Goldman } from 'next/font/google';
 
