@@ -1,5 +1,5 @@
 "use client";
-import { Goldman } from 'next/font/google';
+import { Goldman, Archivo } from 'next/font/google';
 import { Button } from "@nextui-org/react";
 import Slider from "react-slick";
 // Import css files
@@ -7,10 +7,10 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
 const products = [
-    { title: 'BEAST SKATE DECK - PINK', size: 'S', color: 'Red', productType: 'Accessoiries', regularPrice: 499, currentPrice: 459, discount: 16, status: 'NEW', mainSrc: '/api/placeholder/400/320', hoverSrc: '/api/placeholder/400/320', date: '2024-03-15', ifBestSeller: true },
-    { title: 'BEAST SKATE DECK - PINK', size: 'S', color: 'Blue', productType: 'Flannel Pants', regularPrice: 499, currentPrice: 459, discount: 16, status: 'NEW', mainSrc: '/api/placeholder/400/320', hoverSrc: '/api/placeholder/400/320', date: '2024-02-28', ifBestSeller: false },
-    { title: 'BEAST SKATE DECK - BLUE', size: 'S', color: 'Red', productType: 'Cap', regularPrice: 499, currentPrice: 449, discount: 10, status: 'DEAL', mainSrc: '/api/placeholder/400/320', hoverSrc: '/api/placeholder/400/320', date: '2024-01-15', ifBestSeller: true },
-    { title: 'BEAST SKATE DECK - GREEN', size: 'S', color: 'Black', productType: 'Backpack', regularPrice: 499, currentPrice: 399, discount: 20, status: 'TRENDING', mainSrc: '/api/placeholder/400/320', hoverSrc: '/api/placeholder/400/320', date: '2024-03-01', ifBestSeller: true },
+    { title: 'BEAST SKATE DECK - PINK', size: 'S', color: 'Red', productType: 'Accessoiries', regularPrice: 499, currentPrice: 459, discount: 16, status: 'NEW', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-03-15', ifBestSeller: true },
+    { title: 'BEAST SKATE DECK - PINK', size: 'S', color: 'Blue', productType: 'Flannel Pants', regularPrice: 499, currentPrice: 459, discount: 16, status: 'NEW', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-02-28', ifBestSeller: false },
+    { title: 'BEAST SKATE DECK - BLUE', size: 'S', color: 'Red', productType: 'Cap', regularPrice: 499, currentPrice: 449, discount: 10, status: 'DEAL', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-01-15', ifBestSeller: true },
+    { title: 'BEAST SKATE DECK - GREEN', size: 'S', color: 'Black', productType: 'Backpack', regularPrice: 499, currentPrice: 399, discount: 20, status: 'TRENDING', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-03-01', ifBestSeller: true },
 ];
 
 const GoldmanFont = Goldman({
@@ -18,44 +18,39 @@ const GoldmanFont = Goldman({
     weight: ['400'],
 });
 
+const ArchivoFont = Archivo({
+    subsets: ['latin'],
+})
+
 export default function HomePageItems1() {
     const settings = {
-        dots: true,
+        dots: false,
         infinite: true,
-        speed: 5000,
+        speed: 20000,
         slidesToShow: 1,
         slidesToScroll: 1,
         autoplay: true,
         autoplaySpeed: -1000,
         pauseOnHover: false,  // Prevent pausing on hover
         cssEase: "linear",  // Changed to linear for smooth continuous movement
-        arrows: true,
-        className: "w-full h-[400px]" // Add fixed height
+        arrows: false,
+        className: "w-full"
     };
     
 
     return(
         <section className='w-full mx-auto pb-8'>
-            <div className='w-full mb-8'>
-                <div className="slider-container"> {/* Add container with styles */}
+            <div className='w-full'>
+                <div className="pb-6"> {/* Add container with styles */}
                     <Slider {...settings}>
-                        <div className="h-[400px] bg-blue-500">
-                            <h3 className="text-white text-center text-4xl h-full flex items-center justify-center">1</h3>
+                        <div className="h-[65px] bg-[#E74683] border-y border-[#1AACDD]">
+                            <h3 className={`${ArchivoFont.className} pb-1 text-white text-center font-extrabold text-[42px] h-full flex items-center justify-center`}>BEST SELLERS  BEST SELLERS  BEST SELLERS  BEST SELLERS</h3>
                         </div>
-                        <div className="h-[400px] bg-green-500">
-                            <h3 className="text-white text-center text-4xl h-full flex items-center justify-center">2</h3>
+                        <div className="h-[65px] bg-[#E74683] border-y border-[#1AACDD]">
+                            <h3 className={`${ArchivoFont.className} pb-1 text-white text-center font-extrabold text-[42px] h-full flex items-center justify-center`}>BEST SELLERS  BEST SELLERS  BEST SELLERS  BEST SELLERS</h3>
                         </div>
-                        <div className="h-[400px] bg-red-500">
-                            <h3 className="text-white text-center text-4xl h-full flex items-center justify-center">3</h3>
-                        </div>
-                        <div className="h-[400px] bg-purple-500">
-                            <h3 className="text-white text-center text-4xl h-full flex items-center justify-center">4</h3>
-                        </div>
-                        <div className="h-[400px] bg-yellow-500">
-                            <h3 className="text-white text-center text-4xl h-full flex items-center justify-center">5</h3>
-                        </div>
-                        <div className="h-[400px] bg-pink-500">
-                            <h3 className="text-white text-center text-4xl h-full flex items-center justify-center">6</h3>
+                        <div className="h-[65px] bg-[#E74683] border-y border-[#1AACDD]">
+                            <h3 className={`${ArchivoFont.className} pb-1 text-white text-center font-extrabold text-[42px] h-full flex items-center justify-center`}>BEST SELLERS  BEST SELLERS  BEST SELLERS  BEST SELLERS</h3>
                         </div>
                     </Slider>
                 </div>

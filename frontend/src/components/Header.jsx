@@ -184,7 +184,7 @@ export default function Header() {
     <>
     <div style={{zIndex: '999'}} className="bg-[#E74683] relative w-full flex justify-center items-center text-white font-semibold py-2">The ONLY Official MrBeast Merch Store</div>
 
-    <Navbar className="bg-white z-[999] flex justify-between text-black py-4 font-semibold" onMenuOpenChange={setIsMenuOpen}>
+    <Navbar className={`bg-white z-[999] flex justify-between text-black font-semibold transition-all duration-300 ${isScrolled? 'py-2' : 'py-4'}`} onMenuOpenChange={setIsMenuOpen}>
       <NavbarContent>
         <NavbarMenuToggle
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
