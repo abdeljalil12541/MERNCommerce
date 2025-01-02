@@ -5,6 +5,7 @@ import BannerSwiper from "./BannerSwiper"
 import Recommendeditems from "./Recommendeditems"
 import ReviewSwipper from "./ReviewSwipper"
 import HomePageItems1 from "./HomePageItems1"
+import ShopByCategories from "./ShopByCategories"
 
 export default function Home() {
     return(
@@ -12,6 +13,7 @@ export default function Home() {
             <BannerSwiper />
             <HomePageItems1 />
             <AboutHomePage />
+            <ShopByCategories />
             <HomePageItemsWithTitles />
             <FeaturesBanner />
             <ReviewSwipper />
