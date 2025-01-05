@@ -60,14 +60,14 @@ const FeaturesBanner = () => {
   ];
 
   return (
-    <section className={`mt-10 mx-28 ${notoSerif.className}`}>
-        <div className="w-full rounded-xl bg-white container mx-auto border">
+    <section className={`mt-6 mx-28 ${notoSerif.className}`}>
+        <div className="w-full rounded-xl bg-white container mx-auto ">
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                 {features.map((feature, index) => (
                     <div 
                     key={index} 
-                    className="flex items-center space-x-4 px-6 py-12 rounded-xl hover:bg-gray-50 transition-colors duration-200"
+                    className="flex items-center space-x-4 px-6 py-12 rounded-xl hover:bg-[#e7468411] transition-colors duration-200"
                     >
                     <div className="flex-shrink-0">
                         {feature.icon}

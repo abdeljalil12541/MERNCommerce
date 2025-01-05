@@ -45,8 +45,8 @@ export default function HomePageItems2() {
                     <div className="relative">
                         <Slider {...settings}>
                             {[1, 2, 3, 4, 5, 6].map((_, index) => (
-                                <div key={index} className="inline-block h-[65px] border-y border-[#1AACDD]">
-                                    <h3 className={`${ArchivoFont.className} text-sky-500 text-4xl font-extrabold  h-16 flex items-center `}>COLLECTIONS <span className='pl-1.5'>😍</span></h3>
+                                <div key={index} className="inline-block h-[65px] bg-[#E74683] border-y border-[#1AACDD]">
+                                    <h3 className={`${ArchivoFont.className} text-white text-4xl font-extrabold  h-16 flex items-center `}>COLLECTIONS <span className='pl-1.5'>😍</span></h3>
                                 </div>
                             ))}
                         </Slider>

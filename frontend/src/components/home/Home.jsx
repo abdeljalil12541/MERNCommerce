@@ -16,7 +16,6 @@ export default function Home() {
             <AboutHomePage />
             <ShopByCategories />
             <HomePageItems2 />
-            <HomePageItemsWithTitles />
             <FeaturesBanner />
             <ReviewSwipper />
         </div>
