@@ -24,7 +24,7 @@ export default function ShopByCategories() {
                                 src={catImg.src}
                                 alt={catImg.alt} 
                             />
-                            <Button variant="ghost" className="absolute left-1/2 bottom-4 -translate-x-1/2 rounded-full">
+                            <Button variant="ghost" className="absolute data-[hover=true]:!bg-gray-100 left-1/2 bottom-4 -translate-x-1/2 rounded-full">
                                 EXPLORE NOW
                             </Button>
                         </div>

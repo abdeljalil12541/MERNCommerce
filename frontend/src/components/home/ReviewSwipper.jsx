@@ -61,7 +61,10 @@ export default function ReviewSwipper() {
             </Swiper>
 
             <div className="w-full mt-10 flex justify-center">
-                <Button variant="ghost" className="rounded !hover:bg-white">
+                <Button
+                    variant="ghost"
+                    className="rounded border-default data-[hover=true]:!bg-gray-100"
+                    >
                     Add Review <MessageCirclePlus strokeWidth={1.5} />
                 </Button>
             </div>
