@@ -22,7 +22,7 @@ const ArchivoFont = Archivo({
     subsets: ['latin'],
 })
 
-export default function HomePageItems2() {
+export default function HomePageItems3() {
     const settings = {
         dots: false,
         infinite: true,
@@ -39,7 +39,7 @@ export default function HomePageItems2() {
     
 
     return(
-        <section className='w-full mx-auto pb-8 mt-6'>
+        <section className='w-full mx-auto pb-8'>
             <div className='w-full'>
                 <div className="pb-6"> {/* Add container with styles */}
                     <div className="relative">

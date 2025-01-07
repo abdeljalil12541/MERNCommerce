@@ -7,11 +7,11 @@ const notoSerif = Playfair({
 
 export default function FashionHeroSection() {
     return (
-        <section className="w-full pl-20 flex justify-center items-center h-[80vh] bg-neutral-950 text-gray-100">
+        <section className="w-full pl-14 flex justify-center items-center h-[75vh] bg-neutral-950 text-gray-100">
             <div className="grid grid-cols-12 gap-4 max-w-7xl mx-auto px-4">
                 {/* Left Content */}
-                <div className="col-span-4 flex flex-col justify-center">
-                    <p className="text-[#ff481f] text-sm font-semibold uppercase tracking-wider">
+                <div className="col-span-4 flex flex-col justify-center  relative z-50">
+                    <p className="text-[#E74683] text-sm font-semibold uppercase tracking-wider">
                         the process
                     </p>
                     <div className="mt-2">
@@ -30,38 +30,40 @@ export default function FashionHeroSection() {
                 </div>
 
                 {/* Center Fashion Item Image */}
-                <div className="col-span-3 -ml-[100px] flex justify-center items-center">
+                <div className="col-span-3 -ml-[60px] flex justify-center items-center">
                     <img 
-                        src="https://yeatofficial.com/cdn/shop/files/LYFESTYLE_HOODIE_SIGNED_VINYL_2-id24oX6_540x.png?v=1729179532" 
+                        src="https://cdn.discordapp.com/attachments/864979143933296650/1326264140423106570/download_1.png?ex=677ecb3b&is=677d79bb&hm=a0ded9abccb870aa712aa16d03afb408b110829518966bdc056271f9af028c5a&" 
                         alt="Designer Hoodie" 
-                        className="w-full max-w-md transform hover:scale-105 transition-transform duration-300"
+                        className="w-[400px] max-w-md transform hover:scale-105 transition-transform duration-300"
                     />
                 </div>
 
                 {/* Right Content */}
-                <div className="col-span-5 -ml-4 flex flex-col justify-center">
+                <div className="col-span-5 -ml-2 flex flex-col justify-center">
                     <h2 className={`${notoSerif.className} text-5xl mb-4`}>
-                        EXCLUSIVE <span className="text-[#ff481f]">STREET</span> WEAR
+                        EXCLUSIVE <span className="text-[#E74683]">STREET</span> WEAR
                     </h2>
                     <p className="text-gray-400 mb-6">
                         Elevate Your Style With Our Premium Collection Of Street Fashion. Each Piece Is Crafted For Those Who Appreciate Authentic Urban Design.
                     </p>
-                    <Button className="flex items-center gap-2 text-white border border-white px-6 py-6 w-fit hover:bg-white hover:text-black transition-colors duration-300">
-                        SHOP NOW
-                        <svg 
-                            className="w-4 h-4" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            viewBox="0 0 24 24"
-                        >
-                            <path 
-                                strokeLinecap="round" 
-                                strokeLinejoin="round" 
-                                strokeWidth={2} 
-                                d="M9 5l7 7-7 7"
-                            />
-                        </svg>
-                    </Button>
+                    <div className='w-full flex justify-center'>
+                        <Button color='primary' className='uppercase !py-6 !px-6 !rounded-lg'>
+                            SHOP NOW
+                            <svg 
+                                className="w-4 h-4" 
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
+                            >
+                                <path 
+                                    strokeLinecap="round" 
+                                    strokeLinejoin="round" 
+                                    strokeWidth={2} 
+                                    d="M9 5l7 7-7 7"
+                                />
+                            </svg>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </section>
