@@ -32,7 +32,7 @@ export default function FashionHeroSection() {
                 {/* Center Fashion Item Image */}
                 <div className="col-span-3 -ml-[60px] flex justify-center items-center">
                     <img 
-                        src="https://cdn.discordapp.com/attachments/864979143933296650/1326264140423106570/download_1.png?ex=677ecb3b&is=677d79bb&hm=a0ded9abccb870aa712aa16d03afb408b110829518966bdc056271f9af028c5a&" 
+                        src="https://media-hosting.imagekit.io//b772c47ed51e4839/download%20(1).png?Expires=1831225412&Key-Pair-Id=K2ZIVPTIP2VGHC&Signature=m5eHId5fGEGlgvvHMfuWTACM3PTH6iG3UwBBtN6-oxhV~CT4ShE2I2F88pR5sAl1Sj-Lzzc31hQia1hEgVqPYhom1H4GoVy9egkqnGsXUt9mjQnTxrWfIIpKPNu92XYpklPWeobz0vW~X9onUezAMZJzieBcAAoY3nx7rwKzkq2ZTEcOnDfE6bTm3R-brA7ZJs4tomn2nF~isnB2gCfB0piM9foUCnrLPuufL2p47Rs3kxacNWToFnocS6y6UmDYb5QhNbww1Zk~g0Zwgb8acVRt4KDYknI~cXeb~26BOvtmHgCQ54-Pu0J-PlmNQfcZxrKlaV9xHIkvrMlPb6Q2ig__" 
                         alt="Designer Hoodie" 
                         className="w-[400px] max-w-md transform hover:scale-105 transition-transform duration-300"
                     />
