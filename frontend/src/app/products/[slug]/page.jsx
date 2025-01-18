@@ -52,23 +52,47 @@ export default function ProductPage({ slug }) {
     { title: 'BEAST SKATE DECK - GREEN', size: 'S', color: 'Black', productType: 'Backpack', regularPrice: 499, currentPrice: 399, discount: 20, status: 'TRENDING', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-03-01', ifBestSeller: true },
   ];
 
+  const productImgs = [
+    { alt: 'product img 1', src:"https://mrbeast.store/cdn/shop/files/photo_2023-06-29_02-49-55.jpg?v=1718170165&width=1946" },
+    { alt: 'product img 3', src:"https://mrbeast.store/cdn/shop/files/0-6-Fcopy.jpg?v=1718170165&width=1946" },
+    { alt: 'product img 4', src:"https://mrbeast.store/cdn/shop/files/crop_0003_133.jpg?v=1718170165&width=1946" },
+  ]
+
+  const [ activeVarImg, setActiveVarImg ] = useState(0);
+  const [slideDirection, setSlideDirection] = useState('right');
+
+  const handleActiveVarImg = (index) => {
+    setSlideDirection(index > activeVarImg ? 'right' : 'left');
+    setActiveVarImg(index);
+  };
+
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Product: BEAST WAS HERE SS TEE - BLACK</h1>
       <div className="w-full grid grid-cols-2">
         <div className="col-span-1 grid grid-cols-5">
-          <div className="col-span-1">
-            <img className="border h-28 object-cover w-full my-2" src="https://mrbeast.store/cdn/shop/files/0-7-Fcopy.jpg?v=1718170165&width=1946" alt="" />
-            <img className="h-28 object-cover w-full my-2" src="https://mrbeast.store/cdn/shop/files/0-6-Fcopy.jpg?v=1718170165&width=1946" alt="" />
-            <img className="h-28 object-cover w-full my-2" src="https://mrbeast.store/cdn/shop/files/crop_0003_133.jpg?v=1718170165&width=1946" alt="" />
+          <div className="col-span-1 mr-2">
+            {productImgs.length &&
+              productImgs.map((productImg, index) => (
+                  <div key={index} onClick={() => handleActiveVarImg(index)}>
+                    <img className={`${ activeVarImg === index ? 'border-gray-500' : 'border-transparent' } h-28 border hover:border-gray-500 duration-500 cursor-pointer object-cover w-full my-2`} src={productImg.src} alt={productImg.alt} />
+                  </div>
+              ))
+            }
           </div>
-          <div className="col-span-4">
-            <img src="https://mrbeast.store/cdn/shop/files/photo_2023-06-29_02-49-55.jpg?v=1718170165&width=1946" alt="" />
+          <div className="col-span-4 flex overflow-hidden justify-center">
+            <img 
+              key={activeVarImg} // Add key to force re-render
+              src={productImgs[activeVarImg].src} 
+              alt={productImgs[activeVarImg].alt}
+              className={`h-[400px] w-[420px] object-cover  transform transition-all duration-500
+                ${slideDirection === 'right' ? 'animate-slide-from-right' : 'animate-slide-from-left'}
+              `}
+            />
           </div>
         </div>
 
 
-        <div className="col-span-1">
+        <div className="col-span-1 ml-6">
           <div className="w-full">
             <p className="text-2xl">BEAST WAS HERE SS TEE - BLACK </p>
             <div className="w-full flex items-end gap-5 py-4">

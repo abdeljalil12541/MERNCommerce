@@ -11,7 +11,22 @@ module.exports = {
     './src/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {},
+    extend: {
+      keyframes: {
+        'slide-from-right': {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' }
+        },
+        'slide-from-left': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' }
+        }
+      },
+      animation: {
+        'slide-from-right': 'slide-from-right 0.3s ease-out',
+        'slide-from-left': 'slide-from-left 0.3s ease-out'
+      }
+    },
   },
   darkMode: "class",
 
