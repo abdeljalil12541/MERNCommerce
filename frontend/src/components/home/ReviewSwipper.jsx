@@ -13,6 +13,15 @@ import 'swiper/css/autoplay';
 import { Button } from "@nextui-org/react";
 import { MessageCirclePlus } from "lucide-react";
 
+import {
+    Modal,
+    ModalContent,
+    ModalHeader,
+    ModalBody,
+    ModalFooter,
+    useDisclosure,
+} from "@nextui-org/react";
+
 const cars = [
     { id: 1, name: 'Car 1' },
     { id: 2, name: 'Car 2' },
@@ -21,6 +30,7 @@ const cars = [
 ];
 
 export default function ReviewSwipper() {
+    const {isOpen, onOpen, onOpenChange} = useDisclosure();
     return (
         <div className='w-full container mx-auto px-20 mt-16 mb-24 text-gray-700'>
             <p className='text-2xl text-center mt-10 text-[#E74683]'>Let customers speak for us</p>
@@ -62,12 +72,43 @@ export default function ReviewSwipper() {
 
             <div className="w-full mt-10 flex justify-center">
                 <Button
+                    onClick={onOpen}
                     variant="ghost"
                     className="rounded border-default data-[hover=true]:!bg-gray-100"
                     >
                     Add Review <MessageCirclePlus strokeWidth={1.5} />
                 </Button>
             </div>
+
+
+            <Modal
+                classNames={{
+                wrapper: "z-[9999]",
+                backdrop: "z-[9998]",
+                base: "z-[9999]",
+                body: "z-[9999] max-h-[80vh] overflow-y-auto",  // Add these properties
+                content: "z-[9999] relative max-h-[90vh]",  // Add max-height
+                header: "z-[9999]",
+                footer: "z-[9999]"
+                }}
+                className='!z-[9999] h-[550px]' size='4xl' hideCloseButton isOpen={isOpen} onOpenChange={onOpenChange}>
+                <ModalContent>
+                {(onCloses) => (
+                    <>
+                    <ModalBody>
+                        <div className='flex w-full justify-center'>
+                        
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="primary" onPress={onCloses}>
+                        Close
+                        </Button>
+                    </ModalFooter>
+                    </>
+                )}
+                </ModalContent>
+            </Modal>
         </div>
     );
 }

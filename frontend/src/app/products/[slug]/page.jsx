@@ -225,7 +225,7 @@ export default function ProductPage({ slug }) {
             <>
               <ModalBody>
                 <div className="flex items-center justify-between mb-3">
-                  <button onClick={onOpen} className="!-mb-8 -mt-2 hover:text-gray-500 pt-8 flex items-center">
+                  <button className="!-mb-8 -mt-2 cursor-default pt-8 flex items-center">
                     <span className='text-2xl pl-4'>Find my size</span>
                     <svg className="icon icon-ruler tw-w-6 tw-h-6 ml-1 pb-[1px] tw-text-mrb-black tw-ml-2" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 20 20">
                       <path d="M18.9836 5.32852L14.6715 1.01638L1.01638 14.6715L5.32852 18.9836L18.9836 5.32852ZM15.3902 0.297691C14.9933 -0.0992303 14.3497 -0.0992303 13.9528 0.297691L0.297691 13.9528C-0.0992301 14.3497 -0.0992305 14.9932 0.297691 15.3902L4.60983 19.7023C5.00675 20.0992 5.65029 20.0992 6.04721 19.7023L19.7023 6.04721C20.0992 5.65029 20.0992 5.00675 19.7023 4.60983L15.3902 0.297691Z" fillRule="evenodd"></path>
