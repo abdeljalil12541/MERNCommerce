@@ -1,0 +1,70 @@
+@keyframes rotateShake {
+    0% {
+      transform: rotate(0deg);
+    }
+    5% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    10% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    15% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    20% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    25% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    30% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    35% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    40% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    45% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    50% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    55% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    60% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    65% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    70% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    75% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    80% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    85% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    90% {
+      transform: rotate(2deg);   /* Rotate right */
+    }
+    95% {
+      transform: rotate(-2deg);  /* Rotate left */
+    }
+    100% {
+      transform: rotate(0deg);   /* End with no rotation */
+    }
+  }
+  
+  .animate-shake {
+    animation: rotateShake 2s ease-in-out;  /* Duration set to 2s */
+  }
+  

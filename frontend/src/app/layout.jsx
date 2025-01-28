@@ -1,5 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
+import "../components/static/styles/css/shake.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import { Goldman } from 'next/font/google';

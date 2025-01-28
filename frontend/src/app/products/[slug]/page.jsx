@@ -13,6 +13,7 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@nextui-org/react";
+import { motion, useSpring } from 'framer-motion';
 
 
 
@@ -29,6 +30,10 @@ const ArchivoFont = Archivo({
 export default function ProductPage({ slug }) {
   const [selectedSize, setSelectedSize] = useState('XXS/Y12');
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  const x = useSpring(0, {
+    from: 0,
+    to: 200,
+  });
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
@@ -157,7 +162,7 @@ export default function ProductPage({ slug }) {
 
               <p className="text-red-500 mt-3">Very Low Stock:  13  UNITS LEFT </p>
 
-              <Button color="primary" className="rounded-lg my-4 w-full">ADD TO CART</Button>
+              <Button color="primary" className="animate-shake rounded-lg my-4 w-full">ADD TO CART</Button>
             </div>
           </div>
         </div>
