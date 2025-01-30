@@ -6,6 +6,7 @@ import { FaMapMarkerAlt } from 'react-icons/fa';
 import { ChevronDown, X } from 'lucide-react';
 import { GoSearch } from "react-icons/go";
 import { Goldman } from 'next/font/google';
+import { Minus, Plus, Trash2 } from 'lucide-react';
 
 
 const GoldmanFont = Goldman({
@@ -81,7 +82,18 @@ export default function Header() {
       </div>
     </div>
   )
+  const [count, setCount] = useState(1);
 
+  const increment = () => setCount(prev => prev + 1);
+  const decrement = () => setCount(prev => Math.max(0, prev - 1));
+  const handleDelete = () => setCount(0);
+
+  const cartProducts = [
+    { title: "3D BOLT HOODIE - BLACK", price: 299, size: "2Y", img: "https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" },
+    { title: "3D BOLT HOODIE - BLACK", price: 299, size: "2Y", img: "https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" },
+    { title: "3D BOLT HOODIE - BLACK", price: 299, size: "2Y", img: "https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" },
+    { title: "3D BOLT HOODIE - BLACK", price: 299, size: "2Y", img: "https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" },
+  ]
   const list = () => (
     <div
       style={{ width: 340 }}
@@ -94,11 +106,70 @@ export default function Header() {
         </div>
       </div>
 
-      <div className="h-[350px] text-gray-600 mt-9 flex justify-center items-center">
-        <p className="text-lg">no products in the cart</p>
+      <div className="overflow-auto h-[80vh]">
+        {cartProducts.length > 0 ? cartProducts.map((product, index) => (
+
+        <div key={index} className="w-full grid px-4 grid-cols-2 my-2">
+          <div className="col-span-1">
+            <img className="h-52 object-cover rounded-xl" src="https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" alt="" />
+          </div>
+
+          <div className="col-span-1 flex flex-col">
+            <p>3D BOLT HOODIE - BLACK</p>
+            <p className="pt-1 text-gray-700">299.00 DH</p>
+            <div className="my-3">
+              <hr className="border-gray-500" />
+              <div className="flex py-1.5 text-gray-600 justify-between">
+                <p>SIZE</p>
+                <p>2Y</p>
+              </div>
+              <hr className="border-gray-500" />
+            </div>
+            <p className="text-gray-700 uppercase text-xs">item sub-total</p>
+            <p className="text-gray-700 uppercase text-xs flex justify-end">598.00 DH</p>
+            <div className="flex items-center border rounded-lg w-fit">
+              <button
+                onClick={decrement}
+                className="p-2 hover:bg-gray-100 rounded-l-lg transition-colors"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              
+              <div className="w-12 text-center border-x px-2 py-1">
+                {count}
+              </div>
+              
+              <button
+                onClick={increment}
+                className="p-2 hover:bg-gray-100 transition-colors"
+                aria-label="Increase quantity"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+              
+              <button
+                onClick={handleDelete}
+                className="p-2 hover:bg-gray-100 rounded-r-lg transition-colors"
+                aria-label="Delete"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      )) : (
+
+        <div className="hidden h-[350px] text-gray-600 mt-9 justify-center items-center">
+          <p className="text-lg">no products in the cart</p>
+        </div>
+
+      )}
       </div>
 
-      <div className="w-full flex justify-center text-gray-600">
+      <div className="w-full absolute bottom-3 flex justify-center text-gray-600">
         <Button className="uppercase px-10 py-2 rounded-full mt-36 text-gray-500 text-[17px] border-gray-400" variant="bordered">continue shopping</Button>
       </div>
     </div>
@@ -304,6 +375,7 @@ export default function Header() {
         {/* Swipeable Drawer */}
         <SwipeableDrawer
           anchor="right"
+          className="relative"
           open={drawerOpen}
           onClose={toggleDrawer(false)}
           onOpen={toggleDrawer(true)}
