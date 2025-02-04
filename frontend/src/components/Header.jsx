@@ -101,7 +101,7 @@ export default function Header() {
     >
       <div className="text-gray-600 w-full pl-4 pr-2.5 py-3.5 font-light btn btn-primary flex justify-between">
         <p className="text-xl">Shoping Cart</p>
-        <div className="border border-gray-400 p-1">
+        <div className="border-gray-400 pr-2">
           <X size={30} className="cursor-pointer" strokeWidth={1.5} onClick={toggleDrawer(false)} />
         </div>
       </div>
