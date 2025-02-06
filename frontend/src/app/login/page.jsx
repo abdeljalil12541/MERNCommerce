@@ -5,7 +5,7 @@ import Link from "next/link"
 
 export default function Login() {
   return (
-    <div className="flex flex-col h-screen justify-center -my-10 items-center bg-gray-100 dark:bg-gray-900">
+    <div className="flex flex-col h-screen justify-center -my-10 items-center bg-[#e746841c] dark:bg-gray-900">
     <Card className="w-full max-w-md">
       <CardHeader className="flex flex-col gap-3">
         <h1 className="text-2xl text-center">Login</h1>
