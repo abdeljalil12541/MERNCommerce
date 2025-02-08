@@ -83,3 +83,7 @@ body {
   border-color: #e7468463 !important;
 }
 
+
+.component-frame{
+  outline: none !important;
+}

@@ -1,6 +1,5 @@
 "use client";
 import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
 import { 
   Card, 
   CardHeader, 
@@ -11,11 +10,11 @@ import {
   SelectItem, 
   Input 
 } from "@nextui-org/react";
+import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
 
-// Replace with your actual Stripe public key
-const stripePromise = loadStripe('pk_test_YOUR_STRIPE_PUBLIC_KEY');
 
 const Checkout = () => {
+  const isPending  = usePayPalScriptReducer;
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -108,70 +107,10 @@ const Checkout = () => {
     }));
   };
 
-  const handleStripePayment = async (e) => {
-    e.preventDefault();
-    const stripe = await stripePromise;
-
-    // Calculate total amount
-    const totalAmount = cartItems.reduce((total, item) => total + item.price, 0) * 100; // amount in cents
-
-    try {
-      // Call your backend to create a PaymentIntent
-      const response = await fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          amount: totalAmount,
-          currency: 'usd',
-          metadata: {
-            name: `${formData.firstName} ${formData.lastName}`,
-            email: formData.email
-          }
-        })
-      });
-
-      const { clientSecret } = await response.json();
-
-      // Confirm the payment on the client side
-      const result = await stripe.confirmCardPayment(clientSecret, {
-        payment_method: {
-          card: {
-            number: formData.cardNumber,
-            exp_month: formData.cardExpiry.split('/')[0],
-            exp_year: formData.cardExpiry.split('/')[1],
-            cvc: formData.cardCVC
-          },
-          billing_details: {
-            name: `${formData.firstName} ${formData.lastName}`,
-            email: formData.email,
-            address: {
-              line1: formData.address,
-              city: formData.city,
-              state: formData.state,
-              postal_code: formData.zipCode,
-              country: formData.country
-            }
-          }
-        }
-      });
-
-      if (result.error) {
-        // Show error to your customer
-        console.error(result.error.message);
-        alert(`Payment failed: ${result.error.message}`);
-      } else {
-        if (result.paymentIntent.status === 'succeeded') {
-          // Payment successful
-          console.log('Payment succeeded');
-          alert('Payment successful!');
-        }
-      }
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert('An error occurred during payment processing');
-    }
+  const initialOptions = {
+    clientId: "AXz1LXU4Y-9g3uPBqo26Us6FbwJbl34POTjmHnp3aOtNDnkq8ieOmMoQKLw9dU7s2vg1yO5z_mNak-80",
+    currency: "USD",
+    intent: "capture",
   };
 
   return (
@@ -180,14 +119,6 @@ const Checkout = () => {
         <div>
           <Card>
             <CardBody>
-            <Button 
-                color="primary"
-                variant='faded'
-                className="w-full py-6 text-[16px] mt-4 bg-blue-700 text-white border-none"
-                onPress={handleStripePayment}
-            >
-                Pay with Stripe
-            </Button>
               
               <div className="text-center my-4 text-gray-500">OR</div>
 
@@ -286,7 +217,10 @@ const Checkout = () => {
                 </div>
 
                 <div className="w-full">
-                  <Button className='py-6 text-[16px] w-full' color='primary' variant='solid'>Cash on Delivery</Button>
+                  <PayPalScriptProvider options={initialOptions}>
+                    {isPending ? <div className="spinner" /> : null}
+                    <PayPalButtons style={{ layout: "vertical" }} />
+                  </PayPalScriptProvider>
                 </div>
 
                 
