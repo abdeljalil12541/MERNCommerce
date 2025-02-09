@@ -11,7 +11,7 @@ import {
   Input 
 } from "@nextui-org/react";
 import { PayPalScriptProvider, PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
-
+import Stepper from 'react-stepper-horizontal';
 
 const Checkout = () => {
   const isPending  = usePayPalScriptReducer;
@@ -115,6 +115,9 @@ const Checkout = () => {
 
   return (
     <div className="mx-auto p-6">
+      <div className='-mt-8 mb-8'>
+        <Stepper steps={ [{title: 'Step One'}, {title: 'Step Two'}, {title: 'Step Four'}] } activeStep={ 1 } defaultColor="#E0E0E0" completeColor="#E74683" activeColor="#E74683" />
+      </div>
       <div className="grid md:grid-cols-2 gap-8">
         <div>
           <Card>
