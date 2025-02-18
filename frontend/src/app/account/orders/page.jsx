@@ -114,13 +114,9 @@ export default function AccountOrders() {
                     <p className="text-sm text-gray-500 mt-1">{order.date}</p>
                   </div>
                 </div>
-                <Button 
-                  color="primary" 
-                  variant="bordered"
-                  size="sm"
-                >
-                  Détails
-                </Button>
+                <div className="text-sm">
+                    <a href="#" className="text-blue-500 hover:underline">Détails</a>
+                </div>
               </div>
             </Card>
           ))) : ( <EmptyCard /> )}
@@ -153,13 +149,9 @@ export default function AccountOrders() {
                     <p className="text-sm text-gray-500 mt-1">{order.date}</p>
                   </div>
                 </div>
-                <Button 
-                  color="primary" 
-                  variant="bordered"
-                  size="sm"
-                >
-                  Détails
-                </Button>
+                <div className="text-sm">
+                    <a href="#" className="text-blue-500 hover:underline">Détails</a>
+                </div>
               </div>
             </Card>
           ))) : ( <EmptyCard /> )}
@@ -184,6 +176,7 @@ export default function AccountOrders() {
                                     className={`flex-1 rounded-none ${activeTab === 'current' ? 'text-[#E74683] border-b-2 border-[#E74683]' : 'text-gray-500'}`}
                                     variant="light"
                                     onClick={() => setActiveTab('current')}
+                                    disableAnimation
                                 >
                                     EN COURS/LIVRÉES (0)
                                 </Button>
@@ -191,6 +184,7 @@ export default function AccountOrders() {
                                     className={`flex-1 rounded-none ${activeTab === 'canceled' ? 'text-[#E74683] border-b-2 border-[#E74683]' : 'text-gray-500'}`}
                                     variant="light"
                                     onClick={() => setActiveTab('canceled')}
+                                    disableAnimation
                                 >
                                     ANNULÉES/RETOURNÉES (4)
                                 </Button>
