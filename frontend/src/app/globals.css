@@ -87,3 +87,33 @@ body {
 .component-frame{
   outline: none !important;
 }
+
+.style-module_starRatingWrap__q-lJC {
+  display: flex;
+  align-items: center;
+}
+
+.style-module_simpleStarRating__nWUxf {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: row !important;
+  gap: 2px !important; /* Ensures equal spacing */
+}
+
+.style-module_emptyIcons__Bg-FZ {
+  position: relative;
+  display: flex !important;
+  flex-direction: row !important;
+  color: rgb(255, 188, 11) !important;
+}
+
+.style-module_fillIcons__6---A {
+  display: hide !important;
+  width: 100% !important; /* Make sure it overlays correctly */
+}
+
+.style-module_emptyIcons__Bg-FZs {
+  display: flex !important;
+  flex-direction: row !important;
+  color: #cccccc !important;
+}
