@@ -4,14 +4,11 @@ import React, { useState } from 'react';
 import { Card, Button, Divider, CardHeader } from '@nextui-org/react';
 import { ImageIcon, Package, Star } from 'lucide-react';
 import { CardContent } from "@mui/material";
-import { Rating } from 'react-simple-star-rating'
-import EmptyStars from "@/components/EmptyStars";
 import dynamic from 'next/dynamic';
 const ReactStars = dynamic(() => import("react-stars"), { ssr: false });
 
 
 export default function AccountOrders() {
-  const hasPendingReviews = false;
 
   const reviews = [
     {
