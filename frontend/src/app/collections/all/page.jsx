@@ -211,7 +211,7 @@ const All = () => {
           <div className="flex justify-between items-center p-4 border-b">
             <h3 className="text-lg font-medium">Filter and sort</h3>
             <div className="flex items-center">
-              <span className="text-sm text-gray-500 mr-2">158 products</span>
+              <span className="text-sm text-gray-500 mr-2">{filteredProducts.length} products</span>
               <Button isIconOnly variant="light" size="sm" onClick={toggleDrawer(false)}>
                 <X size={20} />
               </Button>
@@ -417,16 +417,54 @@ const All = () => {
 
           {/* Footer */}
           <div className="p-4 border-t flex justify-between">
-            <Button variant="light" onClick={resetFilters}>
+            <Button variant="light" onPress={resetFilters}>
               Remove all
             </Button>
-            <Button color="primary" className="bg-pink-500">
+            <Button onPress={toggleDrawer(false)} color="primary" className="bg-pink-500">
               APPLY
             </Button>
           </div>
         </Card>
       );
     };
+
+    const [openDesktopDropdown, setOpenDesktopDropdown] = useState(null);
+    const toggleDesktopDropdown = (name) => {
+      setOpenDesktopDropdown(openDesktopDropdown === name ? null : name);
+    };
+    
+    const desktopFilterRef = useRef(null);
+    const desktopSortRef = useRef(null);
+    const desktopSizeFilterRef = useRef(null);
+    const desktopColorFilterRef = useRef(null);
+    const desktopProductTypeFilterRef = useRef(null);
+    
+    useEffect(() => {
+      const handleClickOutside = (event) => {
+        // Check which dropdown is open and if click is outside its ref
+        if (openDesktopDropdown === 'size' && desktopSizeFilterRef.current && !desktopSizeFilterRef.current.contains(event.target)) {
+          setOpenDesktopDropdown(null);
+        }
+        
+        if (openDesktopDropdown === 'color' && desktopColorFilterRef.current && !desktopColorFilterRef.current.contains(event.target)) {
+          setOpenDesktopDropdown(null);
+        }
+        
+        if (openDesktopDropdown === 'productType' && desktopProductTypeFilterRef.current && !desktopProductTypeFilterRef.current.contains(event.target)) {
+          setOpenDesktopDropdown(null);
+        }
+        
+        if (openDesktopDropdown === 'sort' && desktopSortRef.current && !desktopSortRef.current.contains(event.target)) {
+          setOpenDesktopDropdown(null);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }, [openDesktopDropdown]); // Add openDesktopDropdown as dependency
+
 
     return (
       <div className="w-full bg-white px-2">
@@ -439,116 +477,133 @@ const All = () => {
         >
           {Drawer()}
         </SwipeableDrawer>
-          <div className="hidden lg:block mx-auto px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div ref={filterRef} className={`${GoldmanFont.className} text-gray-500 flex items-center gap-4`}>
-                    <span className="text-sm font-medium">Filter:</span>
-                    
-                    {/* Filter Dropdowns */}
-                    {Object.entries(filterOptions).map(([filter, options]) => (
-                    <div key={filter} className="relative">
-                        <button
-                        onClick={() => toggleDropdown(filter)}
-                        className="flex items-center gap-2 text-sm capitalize hover:text-gray-600"
-                        >
-                        {filter === 'productType' ? 'Product type' : filter}
-                        <ChevronDown className={`w-4 h-4 mt-1 transition-transform duration-200 ${
-                            openDropdown === filter ? 'rotate-180' : ''
-                        }`} />
-                        </button>
+          {/* Desktop Filters Section */}
+<div className="hidden lg:block mx-auto px-6 py-4">
+  <div className="flex items-center justify-between">
+    <div ref={desktopFilterRef} className={`${GoldmanFont.className} text-gray-500 flex items-center gap-4`}>
+      <span className="text-sm font-medium">Filter:</span>
+      
+      {/* Filter Dropdowns */}
+      {Object.entries(filterOptions).map(([filter, options]) => (
+        <div key={filter} className="relative" ref={
+          filter === 'size' ? desktopSizeFilterRef : 
+          filter === 'color' ? desktopColorFilterRef : 
+          filter === 'productType' ? desktopProductTypeFilterRef : null
+        }>
+          <button
+            onClick={() => toggleDesktopDropdown(filter)}
+            className="flex items-center gap-2 text-sm capitalize hover:text-gray-600"
+          >
+            {filter === 'productType' ? 'Product type' : filter}
+            <ChevronDown className={`w-4 h-4 mt-1 transition-transform duration-200 ${
+              openDesktopDropdown === filter ? 'rotate-180' : ''
+            }`} />
+          </button>
 
-                        {openDropdown === filter && (
-                        <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 shadow-sm py-1 z-10">
-                            <div className="px-4 py-2 border-b border-gray-200">
-                            <div className="flex justify-between text-sm">
-                                <span>{getSelectedCount()} selected</span>
-                                <button
-                                onClick={resetFilters}
-                                className="text-gray-600 hover:text-gray-700 underline"
-                                >
-                                Reset
-                                </button>
-                            </div>
-                            </div>
-                            {filter === 'productType' ? (
-                            // Product type options with counts
-                              options.map((option) => (
-                                <label
-                                key={option.name}
-                                className="flex items-center group justify-between px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
-                                >
-                                <div className="group-hover:text-gray-800 flex items-center">
-                                    <input
-                                      type="checkbox"
-                                      checked={selectedFilters[filter].includes(option.name)}
-                                      onChange={() => toggleFilter(filter, option.name)}
-                                      className="mr-2 rounded border-gray-300 accent-pink-500"
-                                    />
-                                    <span>{option.name}</span>
-                                </div>
-                                <span className="text-gray-500">({option.count})</span>
-                                </label>
-                              ))
-                            ) : (
-                            // Regular options without counts
-                            options.map((option) => (
-                                <label
-                                key={option}
-                                className="flex group items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
-                                >
-                                <input
-                                    type="checkbox"
-                                    checked={selectedFilters[filter].includes(option)}
-                                    onChange={() => toggleFilter(filter, option)}
-                                    className="mr-2 rounded border-gray-300 accent-pink-500"
-                                />
-                                <span className='group-hover:text-gray-800'>{option}</span>
-                                </label>
-                            ))
-                            )}
-                        </div>
-                        )}
-                    </div>
-                    ))}
-                </div>
-
-                {/* Sort Section */}
-                <div ref={sortRef} className={`${GoldmanFont.className} text-gray-500 flex items-center gap-2`}>
-                    <span className="text-sm">Sort by:</span>
-                    <div className="relative">
-                    <button
-                        onClick={() => toggleDropdown('sort')}
-                        className="flex items-center gap-2 text-sm hover:text-gray-600"
-                    >
-                        {selectedSort}
-                        <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
-                        openDropdown === 'sort' ? 'rotate-180' : ''
-                        }`} />
-                    </button>
-
-                    {openDropdown === 'sort' && (
-                        <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 shadow-sm py-1 z-10">
-                        {sortOptions.map((option) => (
-                            <button
-                            key={option}
-                            onClick={() => {
-                                setSelectedSort(option);
-                                toggleDropdown('sort');
-                            }}
-                            className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
-                                selectedSort === option ? 'bg-gray-50' : ''
-                            }`}
-                            >
-                            <span className='hover:text-gray-800'>{option}</span>
-                            </button>
-                        ))}
-                        </div>
-                    )}
-                    </div>
-                    <span className="text-sm text-gray-500 font-sans ml-4">{filteredProducts.length} products</span>
+          {openDesktopDropdown === filter && (
+            <div className="absolute top-full left-0 mt-2 w-48 bg-white border border-gray-200 shadow-sm py-1 z-10">
+              <div className="px-4 py-2 border-b border-gray-200">
+                <div className="flex justify-between text-sm">
+                  <span>{selectedFilters[filter].length} selected</span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedFilters(prev => ({...prev, [filter]: []}));
+                    }}
+                    className="text-gray-600 hover:text-gray-700 underline"
+                  >
+                    Reset
+                  </button>
                 </div>
               </div>
+              {filter === 'productType' ? (
+                // Product type options with counts
+                options.map((option) => (
+                  <label
+                    key={option.name}
+                    className="flex items-center group justify-between px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div className="group-hover:text-gray-800 flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedFilters[filter].includes(option.name)}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          toggleFilter(filter, option.name, e);
+                        }}
+                        className="mr-2 rounded border-gray-300 accent-pink-500"
+                      />
+                      <span>{option.name}</span>
+                    </div>
+                    <span className="text-gray-500">({option.count})</span>
+                  </label>
+                ))
+              ) : (
+                // Regular options without counts
+                options.map((option) => (
+                  <label
+                    key={option}
+                    className="flex group items-center px-4 py-2 text-sm hover:bg-gray-50 cursor-pointer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedFilters[filter].includes(option)}
+                      onChange={(e) => {
+                        e.stopPropagation();
+                        toggleFilter(filter, option, e);
+                      }}
+                      className="mr-2 rounded border-gray-300 accent-pink-500"
+                    />
+                    <span className='group-hover:text-gray-800'>{option}</span>
+                  </label>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+
+    {/* Sort Section */}
+    <div ref={desktopSortRef} className={`${GoldmanFont.className} text-gray-500 flex items-center gap-2`}>
+      <span className="text-sm">Sort by:</span>
+      <div className="relative">
+        <button
+          onClick={() => toggleDesktopDropdown('sort')}
+          className="flex items-center gap-2 text-sm hover:text-gray-600"
+        >
+          {selectedSort}
+          <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${
+            openDesktopDropdown === 'sort' ? 'rotate-180' : ''
+          }`} />
+        </button>
+
+        {openDesktopDropdown === 'sort' && (
+          <div className="absolute top-full right-0 mt-2 w-48 bg-white border border-gray-200 shadow-sm py-1 z-10">
+            {sortOptions.map((option) => (
+              <button
+                key={option}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedSort(option);
+                  toggleDesktopDropdown('sort');
+                }}
+                className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                  selectedSort === option ? 'bg-gray-50' : ''
+                }`}
+              >
+                <span className='hover:text-gray-800'>{option}</span>
+              </button>
+            ))}
           </div>
+        )}
+      </div>
+      <span className="text-sm text-gray-500 font-sans ml-4">{filteredProducts.length} products</span>
+    </div>
+  </div>
+</div>
 
           <div className="lg:hidden mx-auto px-6 py-4">
             <div className='flex justify-between'>
@@ -557,7 +612,7 @@ const All = () => {
                 <span className='ml-2 group-hover:underline'>Filter and sort</span>
               </div>
 
-              <p className='text-gray-500 font-sans text-sm pt-[2px]'> 158 products </p>
+              <p className='text-gray-500 font-sans text-sm pt-[2px]'> {filteredProducts.length} products </p>
             </div>
           </div>
 
