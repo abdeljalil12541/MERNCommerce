@@ -46,7 +46,7 @@ export default function AccountIndex() {
           email: response.data.email || prev.email,
         }));
       } catch (err) { // No type annotation
-        console.error('Axios error:', err.response || err);
+        console.log('Axios error:', err.response || err);
         setError(
           err.response?.data?.message || err.message || 'An error occurred while fetching user data'
         );
