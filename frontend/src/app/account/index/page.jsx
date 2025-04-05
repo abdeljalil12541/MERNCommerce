@@ -13,11 +13,11 @@ export default function AccountIndex() {
     email: '',
     creditBalance: '0.00 Dhs',
     address: {
-      name: 'chkir abde',
-      line1: 'lamia5',
-      line2: 'rue165, num31',
-      city: 'CASABLANCA - Ben Msick, Grand Casablanca',
-      phone: '+212 617465647 / +212 617465647'
+      name: '',
+      street: '',
+      city: '',
+      postalCode: '',
+      phone: ''
     }
   });
   const [loading, setLoading] = useState(true);
@@ -44,6 +44,14 @@ export default function AccountIndex() {
           ...prev,
           name: response.data.username || prev.name,
           email: response.data.email || prev.email,
+          address: {
+            ...prev.address,
+            name: response.data.addresses?.[0]?.name || prev.address.name,
+            street: response.data.addresses?.[0]?.street || prev.address.street,
+            city: response.data.addresses?.[0]?.city || prev.address.city,
+            postalCode: response.data.addresses?.[0]?.postalCode || prev.address.postalCode,
+            phone: response.data.addresses?.[0]?.phone || prev.address.phone
+          }
         }));
       } catch (err) { // No type annotation
         console.log('Axios error:', err.response || err);
@@ -101,26 +109,27 @@ export default function AccountIndex() {
             </Card>
             
             <Card className="bg-white shadow-sm">
-              <CardHeader className="pb-2 flex justify-between">
+              <CardHeader className="pb-2 flex relative justify-between">
                 <h2 className="text-md uppercase font-medium text-gray-700">
                   Adresses
                 </h2>
-                <Button 
-                  isIconOnly 
-                  size="sm" 
-                  variant="light" 
-                  color="warning"
-                  className="min-w-0 w-auto h-auto p-0"
-                >
-                  <Edit size={18} className="text-orange-400" />
-                </Button>
+                  <Button 
+                    as="a"
+                    size="sm" 
+                    color="primary" 
+                    variant="light"
+                    href="#"
+                    className="bg-none font-normal absolute right-1"
+                  >
+                    <Edit size={16} />
+                  </Button>
               </CardHeader>
               <CardBody className="pt-2">
                 <p className="text-sm font-medium">Adresse par défaut :</p>
                 <div className="text-sm">{userInfo.address.name}</div>
-                <div className="text-sm">{userInfo.address.line1}</div>
-                <div className="text-sm">{userInfo.address.line2}</div>
+                <div className="text-sm">{userInfo.address.street}</div>
                 <div className="text-sm">{userInfo.address.city}</div>
+                <div className="text-sm">{userInfo.address.postalCode}</div>
                 <div className="text-sm text-gray-500">{userInfo.address.phone}</div>
               </CardBody>
             </Card>

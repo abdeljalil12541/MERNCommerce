@@ -1,20 +1,16 @@
 "use client";
 import SideBar from "../../../components/SideBar"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardBody, CardHeader } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
+import api from "@/lib/api";
+import Swal from "sweetalert2";
 
 export default function ManageAccount() {
   const [formData, setFormData] = useState({
-    name: 'chkir abdeljalil',
-    email: 'abdorca534@gmail.com',
-    address: {
-      name: 'chkir abde',
-      street: 'rue165, num31',
-      city: 'CASABLANCA - Ben Msick, Grand Casablanca',
-      phone: '+212 617455647'
-    },
+    username: '',
+    email: '',
     password: {
       current: '12345678',
       new: '',
@@ -22,9 +18,141 @@ export default function ManageAccount() {
     }
   });
 
-  const handleSubmit = (e, formType) => {
+  const [userId, setUserId] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "bottom-end",
+    showConfirmButton: false,
+    timer: 3000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
+  });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        console.log("Fetching user data from /me...");
+        const response = await api.get("/users/me");
+        console.log("Full response from /me:", response.data);
+
+        const userInfo = response.data;
+        console.log("Extracted user info:", userInfo);
+
+        if (userInfo) {
+          setFormData(prev => ({
+            ...prev,
+            username: userInfo.username || prev.username,
+            email: userInfo.email || prev.email
+          }));
+          setUserId(userInfo._id);
+          console.log("Set userId to:", userInfo._id);
+        } else {
+          setError("No user data found");
+          console.log("No user data available in response");
+        }
+      } catch (err) {
+        console.log("Error fetching user data:", err);
+        console.log("Error details:", err.response?.data || err.message);
+        setError("Failed to load user data");
+        Toast.fire({
+          icon: "error",
+          title: "Failed to load user data",
+        });
+      } finally {
+        setLoading(false);
+        console.log("Fetch complete, state:", { loading, error, userId });
+      }
+    };
+    fetchUserData();
+  }, []);
+
+  const handleUpdateUserInfo = async (e) => {
     e.preventDefault();
-    console.log(`${formType} form submitted:`, formType === 'password' ? formData.password : formData);
+    setError(null);
+    setLoading(true);
+
+    try {
+      console.log("Submitting to /users/me/user-info with data:", {
+        username: formData.username,
+        email: formData.email
+      });
+      
+      const response = await api.put(`/users/me/user-info/${userId}`, {
+        username: formData.username,
+        email: formData.email
+      });
+      
+      console.log("update user info response: ", response.data);
+      Toast.fire({
+        icon: "success",
+        title: "User info updated successfully",
+      });
+    } catch (err) {
+      console.error("Error updating user info:", err);
+      console.error("Error details:", err.response?.data || err.message);
+      
+      Toast.fire({
+        icon: "error",
+        title: "Failed to update user info",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e, type) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+    
+    if (type === 'password') {
+      if (formData.password.new !== formData.password.confirm) {
+        Toast.fire({
+          icon: "error",
+          title: "New passwords don't match",
+        });
+        setLoading(false);
+        return;
+      }
+      
+      try {
+        const response = await api.put(`/users/me/password/${userId}`, {
+          currentPassword: formData.password.current,
+          newPassword: formData.password.new
+        });
+        
+        console.log("Password update response:", response.data);
+        Toast.fire({
+          icon: "success",
+          title: "Password updated successfully",
+        });
+        
+        // Reset password fields
+        setFormData(prev => ({
+          ...prev,
+          password: {
+            current: '',
+            new: '',
+            confirm: ''
+          }
+        }));
+      } catch (err) {
+        console.error("Error updating password:", err);
+        Toast.fire({
+          icon: "error",
+          title: err.response?.data?.message || "Failed to update password",
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
   };
 
   const handleChange = (e) => {
@@ -67,14 +195,15 @@ export default function ManageAccount() {
                   <h2 className="text-lg font-semibold">Informations Personnelles</h2>
                 </CardHeader>
                 <CardBody>
-                  <form onSubmit={(e) => handleSubmit(e, 'personal')} className="space-y-4">
+                  <form onSubmit={handleUpdateUserInfo} className="space-y-4">
                     <Input
                       label="Nom"
-                      name="name"
-                      value={formData.name}
+                      name="username"
+                      value={formData.username}
                       onChange={handleChange}
                       variant="bordered"
                       className="w-full"
+                      isDisabled={loading}
                     />
                     <Input
                       label="Email"
@@ -84,12 +213,15 @@ export default function ManageAccount() {
                       onChange={handleChange}
                       variant="bordered"
                       className="w-full"
+                      isDisabled={loading}
                     />
                     <div className="left-0 right-0 bottom-3 px-3 absolute">
                       <Button 
                         type="submit"
                         color="primary"
                         className="w-full"
+                        isLoading={loading}
+                        isDisabled={loading}
                       >
                         Modifier les informations
                       </Button>
@@ -143,57 +275,6 @@ export default function ManageAccount() {
                 </CardBody>
               </Card>
             </div>
-
-              {/* Address Card */}
-              <Card className="w-full hidden">
-                <CardHeader className="border-b border-gray-200">
-                  <h2 className="text-lg font-semibold">Adresse</h2>
-                </CardHeader>
-                <CardBody>
-                  <form onSubmit={(e) => handleSubmit(e, 'address')} className="space-y-4">
-                    <Input
-                      label="Nom d'adresse"
-                      name="address.name"
-                      value={formData.address.name}
-                      onChange={handleChange}
-                      variant="bordered"
-                      className="w-full"
-                    />
-                    <Input
-                      label="Rue"
-                      name="address.street"
-                      value={formData.address.street}
-                      onChange={handleChange}
-                      variant="bordered"
-                      className="w-full"
-                    />
-                    <Input
-                      label="Ville"
-                      name="address.city"
-                      value={formData.address.city}
-                      onChange={handleChange}
-                      variant="bordered"
-                      className="w-full"
-                    />
-                    <Input
-                      label="Téléphone"
-                      name="address.phone"
-                      value={formData.address.phone}
-                      onChange={handleChange}
-                      variant="bordered"
-                      className="w-full"
-                    />
-                    <Button 
-                      type="submit"
-                      color="primary"
-                      className="w-full"
-                    >
-                      Modifier l'adresse
-                    </Button>
-                  </form>
-                </CardBody>
-              </Card>
-            
           </div>
         </div>
       </div>
