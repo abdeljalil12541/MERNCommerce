@@ -6,13 +6,14 @@ import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import api from "@/lib/api";
 import Swal from "sweetalert2";
+import Loader from "@/components/Loader";
 
 export default function ManageAccount() {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: {
-      current: '12345678',
+      current: '',
       new: '',
       confirm: ''
     }
@@ -95,8 +96,8 @@ export default function ManageAccount() {
         title: "User info updated successfully",
       });
     } catch (err) {
-      console.error("Error updating user info:", err);
-      console.error("Error details:", err.response?.data || err.message);
+      console.log("Error updating user info:", err);
+      console.log("Error details:", err.response?.data || err.message);
       
       Toast.fire({
         icon: "error",
@@ -107,51 +108,33 @@ export default function ManageAccount() {
     }
   };
 
-  const handleSubmit = async (e, type) => {
+  const handleUpdatePassword = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-    
-    if (type === 'password') {
-      if (formData.password.new !== formData.password.confirm) {
-        Toast.fire({
-          icon: "error",
-          title: "New passwords don't match",
-        });
-        setLoading(false);
-        return;
-      }
+
+    try {
+      const response = await api.put(`/users/me/update-password/${userId}`, {
+        oldPassword: formData.password.current,
+        newPassword: formData.password.new,
+        confirmPassword: formData.password.confirm
+      });
       
-      try {
-        const response = await api.put(`/users/me/password/${userId}`, {
-          currentPassword: formData.password.current,
-          newPassword: formData.password.new
-        });
-        
-        console.log("Password update response:", response.data);
-        Toast.fire({
-          icon: "success",
-          title: "Password updated successfully",
-        });
-        
-        // Reset password fields
-        setFormData(prev => ({
-          ...prev,
-          password: {
-            current: '',
-            new: '',
-            confirm: ''
-          }
-        }));
-      } catch (err) {
-        console.error("Error updating password:", err);
-        Toast.fire({
-          icon: "error",
-          title: err.response?.data?.message || "Failed to update password",
-        });
-      } finally {
-        setLoading(false);
-      }
+      console.log("update password response: ", response.data);
+      Toast.fire({
+        icon: "success",
+        title: "password updated successfully",
+      });
+    } catch (err) {
+      console.log("Error updating password:", err);
+      console.log("Error details:", err.response?.data || err.message);
+      
+      Toast.fire({
+        icon: "error",
+        title: "Failed to update password",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -220,7 +203,6 @@ export default function ManageAccount() {
                         type="submit"
                         color="primary"
                         className="w-full"
-                        isLoading={loading}
                         isDisabled={loading}
                       >
                         Modifier les informations
@@ -236,7 +218,7 @@ export default function ManageAccount() {
                   <h2 className="text-lg font-semibold">Changer le mot de passe</h2>
                 </CardHeader>
                 <CardBody>
-                  <form onSubmit={(e) => handleSubmit(e, 'password')} className="space-y-4">
+                  <form onSubmit={(e) => handleUpdatePassword(e)} className="space-y-4">
                     <Input
                       label="Mot de passe actuel"
                       name="password.current"
@@ -278,6 +260,9 @@ export default function ManageAccount() {
           </div>
         </div>
       </div>
+      {loading &&
+        <Loader />
+      }
     </div>
   );
 }
