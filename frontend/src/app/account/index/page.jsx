@@ -6,6 +6,7 @@ import SideBar from "../../../components/SideBar";
 import { Card, CardHeader, CardBody, Button, Divider, Avatar } from '@nextui-org/react';
 import { Edit, CreditCard, Mail, Home, User } from 'lucide-react';
 import Loader from '@/components/Loader';
+import Link from "next/link";
 
 export default function AccountIndex() {
   const [userInfo, setUserInfo] = useState({
@@ -92,19 +93,17 @@ export default function AccountIndex() {
                   <p className="font-medium">{userInfo.name}</p>
                   <p className="text-sm text-gray-500">{userInfo.email}</p>
                 </div>
-                <div className="mt-4">
+                <Link href="/account/settings" className="mt-4">
                   <Button 
-                    as="a"
                     size="sm" 
                     color="primary" 
                     variant="light"
-                    href="#"
                     className="px-2 font-normal"
                     endContent={<Edit size={16} className="ml-1" />}
                   >
                     Modifier les informations
                   </Button>
-                </div>
+                </Link>
               </CardBody>
             </Card>
             
@@ -113,16 +112,16 @@ export default function AccountIndex() {
                 <h2 className="text-md uppercase font-medium text-gray-700">
                   Adresses
                 </h2>
+                <Link href="/account/address">
                   <Button 
-                    as="a"
                     size="sm" 
                     color="primary" 
                     variant="light"
-                    href="#"
                     className="bg-none font-normal absolute right-1"
                   >
                     <Edit size={16} />
                   </Button>
+                </Link>
               </CardHeader>
               <CardBody className="pt-2">
                 <p className="text-sm font-medium">Adresse par défaut :</p>
@@ -163,17 +162,17 @@ export default function AccountIndex() {
                     Gérez vos communications par e-mail pour rester informé des dernières nouvelles et offres.
                   </p>
                 </div>
-                <Button 
-                  as="a"
-                  size="sm" 
-                  variant="light"
-                  color="primary"
-                  href="#" 
-                  className="px-0 font-normal"
-                  endContent={<Mail size={16} className="ml-1" />}
-                >
-                  Modifier les préférences de communication
-                </Button>
+                <Link href="/account/newsletter/manage">
+                  <Button 
+                    size="sm" 
+                    variant="light"
+                    color="primary"
+                    className="px-2 font-normal"
+                    endContent={<Mail size={16} className="ml-1" />}
+                  >
+                    Modifier les préférences de communication
+                  </Button>
+                </Link>
               </CardBody>
             </Card>
           </div>

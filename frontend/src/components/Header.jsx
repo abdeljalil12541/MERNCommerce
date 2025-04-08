@@ -7,7 +7,8 @@ import { ChevronDown, X } from 'lucide-react';
 import { GoSearch } from "react-icons/go";
 import { Goldman } from 'next/font/google';
 import { Minus, Plus, Trash2 } from 'lucide-react';
-
+import api from "@/lib/api";
+import { useRouter } from "next/navigation";
 
 const GoldmanFont = Goldman({
     subsets: ['latin'],
@@ -18,7 +19,30 @@ export default function Header() {
   const [drawerOpen, setDrawerOpen] = useState(false); // State to manage drawer
   const [drawerSearchOpen, setDrawerSearchOpen] = useState(false); // State to manage drawer
   const searchRef = useRef(null);
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter(); // If using Next.js
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await api.get('/users/me');
+        setIsAuthenticated(true);
+      } catch (err) {
+        setIsAuthenticated(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    const destination = isAuthenticated ? '/account/index' : '/login';
+    router.push(destination); // For Next.js
+    // Or for regular navigation: window.location.href = destination;
+  };
 
   const toggleSearchDrawer = (open) => () => {
     setDrawerSearchOpen(open);
@@ -261,7 +285,7 @@ export default function Header() {
           aria-label={isMenuOpen ? "Close menu" : "Open menu"}
           className="sm:hidden"
         />
-        <NavbarBrand>
+        <Link href="/">
           <img 
             className={`max-w-none transition-all duration-300 ease-in-out ${
               isScrolled ? 'h-[38px] mr-9' : 'h-[49px]'
@@ -269,7 +293,7 @@ export default function Header() {
             src={logo} 
             alt="Logo" 
           />
-        </NavbarBrand>
+        </Link>
       </NavbarContent>
       <NavbarContent className="hidden sm:flex gap-6 " justify="center">
         <NavbarItem className="bg-[#17C964] hover:bg-[#40ff93] duration-300 py-[2px] text-white px-3 rounded-full">
@@ -354,14 +378,14 @@ export default function Header() {
         </SwipeableDrawer>
       </NavbarContent>
 
-      <NavbarContent>
-        <NavbarItem className="flex cursor-pointer">
-            <svg width="20px" height="20px" fill="#000000" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" className="icon icon-account tw-w-6 tw-h-6" viewBox="0 0 18 19">
-              <path fillRule="evenodd" clipRule="evenodd" d="M6 4.5a3 3 0 116 0 3 3 0 01-6 0zm3-4a4 4 0 100 8 4 4 0 000-8zm5.58 12.15c1.12.82 1.83 2.24 1.91 4.85H1.51c.08-2.6.79-4.03 1.9-4.85C4.66 11.75 6.5 11.5 9 11.5s4.35.26 5.58 1.15zM9 10.5c-2.5 0-4.65.24-6.17 1.35C1.27 12.98.5 14.93.5 18v.5h17V18c0-3.07-.77-5.02-2.33-6.15-1.52-1.1-3.67-1.35-6.17-1.35z" fill="currentColor">
-              </path>
-            </svg>
-        </NavbarItem>
-      </NavbarContent>
+      <NavbarItem className="flex cursor-pointer">
+        <div onClick={handleClick}>
+          <svg width="20px" height="20px" fill="#000000" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" className="icon icon-account tw-w-6 tw-h-6" viewBox="0 0 18 19">
+            <path fillRule="evenodd" clipRule="evenodd" d="M6 4.5a3 3 0 116 0 3 3 0 01-6 0zm3-4a4 4 0 100 8 4 4 0 000-8zm5.58 12.15c1.12.82 1.83 2.24 1.91 4.85H1.51c.08-2.6.79-4.03 1.9-4.85C4.66 11.75 6.5 11.5 9 11.5s4.35.26 5.58 1.15zM9 10.5c-2.5 0-4.65.24-6.17 1.35C1.27 12.98.5 14.93.5 18v.5h17V18c0-3.07-.77-5.02-2.33-6.15-1.52-1.1-3.67-1.35-6.17-1.35z" fill="currentColor">
+            </path>
+          </svg>
+        </div>
+      </NavbarItem>
 
       <NavbarContent className="">
         <NavbarItem onClick={toggleDrawer(true)} className="-mr-14 flex cursor-pointer relative">

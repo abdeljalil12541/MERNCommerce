@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Swal from 'sweetalert2';
 import { useState } from "react";
+import Loader from "@/components/Loader";
 
 export default function Login() {
   const [error, setError] = useState(null);
@@ -116,7 +117,7 @@ export default function Login() {
               color="primary"
               disabled={loading}
             >
-              {loading ? 'Logging in...' : 'Login'}
+              Login
             </Button>
             <Link href="#" className="text-sm text-center" prefetch={false}>
               Forgot Password?
@@ -130,6 +131,10 @@ export default function Login() {
           Sign up
         </Link>
       </div>
+
+      {loading && 
+        <Loader />
+      }
     </div>
   );
 }
