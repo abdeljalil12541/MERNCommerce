@@ -117,3 +117,10 @@ body {
   flex-direction: row !important;
   color: #cccccc !important;
 }
+
+
+
+          /*************** if there is a problem with styling remove this i add just because of the ouline removing purpose ***************/
+:root, .light, [data-theme="light"] {
+  --nextui-background: 0 !important;
+}
