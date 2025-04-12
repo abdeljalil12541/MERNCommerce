@@ -42,6 +42,7 @@ const All = () => {
             }
           });
           console.log('products response: ', response.data);
+          setProducts(response.data);
         } catch (err) {
           console.log('error while fetching products response...')
         } finally {
@@ -50,9 +51,9 @@ const All = () => {
       };
 
       fetchProducts();
-    })
+    }, [])
   
-
+    console.log('products stored: ', products)
 
     const sortOptions = [
       'Featured',
@@ -146,7 +147,7 @@ const All = () => {
     };
 
     // Filter the product list based on selected filters
-    const filteredProducts = productsAll.filter((product) => {
+    const filteredProducts = products.filter((product) => {
       const matchesSize =
         selectedFilters.size.length === 0 || selectedFilters.size.includes(product.size);
       const matchesColor =
