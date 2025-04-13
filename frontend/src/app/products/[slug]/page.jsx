@@ -1,6 +1,6 @@
 "use client";
 import { Goldman, Archivo } from 'next/font/google';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { Button } from "@nextui-org/react";
 import ReviewSwipper from '@/components/home/ReviewSwipper';
@@ -14,7 +14,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { motion, useSpring } from 'framer-motion';
-
+import Loader from '@/components/Loader';
 
 
 const GoldmanFont = Goldman({
@@ -27,13 +27,35 @@ const ArchivoFont = Archivo({
 })
 
 
-export default function ProductPage({ slug }) {
+export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState('XXS/Y12');
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
+  const [loading, setLoading] = useState(true);
+  const [product, setProduct] = useState([]);
   const x = useSpring(0, {
     from: 0,
     to: 200,
   });
+
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const storedProduct = sessionStorage.getItem('currentProduct');
+        if (storedProduct) {
+          setProduct(JSON.parse(storedProduct));
+        }
+      } catch (err) {
+        console.log('error fetching product in product detail page: ', err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchProduct();
+  }, [])
+
+  console.log('product page: ', product)
+
 
   const handleSizeSelect = (size) => {
     setSelectedSize(size);
@@ -99,7 +121,7 @@ export default function ProductPage({ slug }) {
 
         <div className="col-span-1 ml-6">
           <div className="w-full">
-            <p className="text-2xl">BEAST WAS HERE SS TEE - BLACK </p>
+            <p className="text-2xl">{product.title} </p>
             <div className="w-full flex items-end gap-5 py-4">
               <span className="text-gray-500 pb-1 text-sm line-through">365.00 dh</span>
               <p className="text-3xl">183.00 dh</p>
@@ -384,6 +406,10 @@ export default function ProductPage({ slug }) {
           )}
         </ModalContent>
       </Modal>
+
+      {loading && 
+        <Loader />
+      }
     </div>
   );
 }
