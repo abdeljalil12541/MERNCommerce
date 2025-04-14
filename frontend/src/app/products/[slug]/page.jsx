@@ -54,7 +54,7 @@ export default function ProductPage() {
     fetchProduct();
   }, [])
 
-  console.log('product page: ', product)
+  console.log('product page: ', product);
 
 
   const handleSizeSelect = (size) => {
@@ -98,23 +98,35 @@ export default function ProductPage() {
       <div className="w-full grid grid-cols-2">
         <div className="col-span-1 grid grid-cols-5">
           <div className="col-span-1 mr-2">
-            {productImgs.length &&
-              productImgs.map((productImg, index) => (
-                  <div key={index} onClick={() => handleActiveVarImg(index)}>
-                    <img className={`${ activeVarImg === index ? 'border-gray-500' : 'border-transparent' } h-28 border hover:border-gray-500 duration-500 cursor-pointer object-cover w-full my-2`} src={productImg.src} alt={productImg.alt} />
-                  </div>
+            {product?.mainSrc && product?.variationImages ? (
+              [...[product.mainSrc], ...product.variationImages].map((productImg, index) => (
+                <div key={index} onClick={() => handleActiveVarImg(index)}>
+                  <img
+                    className={`${
+                      activeVarImg === index ? 'border-gray-500' : 'border-transparent'
+                    } h-28 border hover:border-gray-500 duration-500 cursor-pointer object-cover w-full my-2`}
+                    src={productImg}
+                    alt={`product variation ${index + 1}`}
+                  />
+                </div>
               ))
-            }
+            ) : (
+              <div>Loading images...</div> // Fallback UI
+            )}
           </div>
           <div className="col-span-4 flex overflow-hidden justify-center">
-            <img 
-              key={activeVarImg} // Add key to force re-render
-              src={productImgs[activeVarImg].src} 
-              alt={productImgs[activeVarImg].alt}
-              className={`h-[400px] w-[420px] object-cover  transform transition-all duration-500
-                ${slideDirection === 'right' ? 'animate-slide-from-right' : 'animate-slide-from-left'}
-              `}
-            />
+            {product?.mainSrc && product?.variationImages && [...[product.mainSrc], ...product.variationImages].length > 0 ? (
+              <img
+                key={activeVarImg}
+                src={[...[product.mainSrc], ...product.variationImages][activeVarImg]}
+                alt={`product variation ${activeVarImg + 1}`}
+                className={`h-[400px] w-[420px] object-cover transform transition-all duration-500
+                  ${slideDirection === 'right' ? 'animate-slide-from-right' : 'animate-slide-from-left'}
+                `}
+              />
+            ) : (
+              <div>Loading image...</div> // Fallback UI
+            )}
           </div>
         </div>
 
