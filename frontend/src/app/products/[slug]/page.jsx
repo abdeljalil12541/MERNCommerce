@@ -28,7 +28,7 @@ const ArchivoFont = Archivo({
 
 
 export default function ProductPage() {
-  const [selectedSize, setSelectedSize] = useState('XXS/Y12');
+  const [selectedSize, setSelectedSize] = useState('');
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState([]);
@@ -42,7 +42,10 @@ export default function ProductPage() {
       try {
         const storedProduct = sessionStorage.getItem('currentProduct');
         if (storedProduct) {
-          setProduct(JSON.parse(storedProduct));
+          const parsedProduct = JSON.parse(storedProduct);
+          setProduct(parsedProduct);
+          setSelectedSize(parsedProduct.sizes[0]);
+          console.log('product sizes: ', parsedProduct.sizes)
         }
       } catch (err) {
         console.log('error fetching product in product detail page: ', err.message);
@@ -62,15 +65,19 @@ export default function ProductPage() {
   };
 
   const sizes = [
-    { name: 'XXS/Y12', disabled: false },
-    { name: 'XS/Y14', disabled: false }, 
-    { name: 'SM', disabled: true },
-    { name: 'MD', disabled: true },
-    { name: 'LG', disabled: true },
-    { name: 'XL', disabled: true },
-    { name: '2XL', disabled: false },
-    { name: '3XL', disabled: false }
-  ];
+    { name: 'XXS/Y12' },
+    { name: 'XS/Y14' },
+    { name: 'S' },
+    { name: 'M' },
+    { name: 'L' },
+    { name: 'XL' },
+    { name: '2XL' },
+    { name: '3XL' },
+  ].map((size) => ({
+    ...size,
+    // A size is disabled if it's not included in the product.sizes array
+    disabled: !product.sizes || !product.sizes.includes(size.name)
+  }));
 
   const products = [
     { title: 'BEAST SKATE DECK - PINK', size: 'S', color: 'Red', productType: 'Accessoiries', regularPrice: 499, currentPrice: 459, discount: 16, status: 'NEW', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-03-15', ifBestSeller: true },
@@ -120,7 +127,7 @@ export default function ProductPage() {
                 key={activeVarImg}
                 src={[...[product.mainSrc], ...product.variationImages][activeVarImg]}
                 alt={`product variation ${activeVarImg + 1}`}
-                className={`h-[400px] w-[420px] object-cover transform transition-all duration-500
+                className={`h-[400px] w-[420px] object-cover transform transition-all duration-500 rounded-md
                   ${slideDirection === 'right' ? 'animate-slide-from-right' : 'animate-slide-from-left'}
                 `}
               />
@@ -135,9 +142,9 @@ export default function ProductPage() {
           <div className="w-full">
             <p className="text-2xl">{product.title} </p>
             <div className="w-full flex items-end gap-5 py-4">
-              <span className="text-gray-500 pb-1 text-sm line-through">365.00 dh</span>
-              <p className="text-3xl">183.00 dh</p>
-              <p className="text-lg pb-[1px] text-[#E74683]">49% off</p>
+              <span className="text-gray-500 pb-1 text-sm line-through">{product?.regularPrice?.toFixed(2)} dh</span>
+              <p className="text-3xl">{product?.currentPrice?.toFixed(2)} dh</p>
+              <p className="text-lg pb-[1px] text-[#E74683]">{product?.discount}% off</p>
             </div>
 
             <hr className="border-gray-500 mb-1" />
@@ -194,7 +201,7 @@ export default function ProductPage() {
                 ))}
               </div>
 
-              <p className="text-red-500 mt-3">Very Low Stock:  13  UNITS LEFT </p>
+              <p className={`mt-3 ${product?.stock <= 50 ? 'text-red-500' : 'hidden'}`}>Very Low Stock:  {product.stock}  UNITS LEFT </p>
 
               <Button color="primary" className="animate-shake rounded-lg my-4 w-full">ADD TO CART</Button>
             </div>
