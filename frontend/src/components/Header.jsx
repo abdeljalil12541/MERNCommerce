@@ -9,6 +9,8 @@ import { Goldman } from 'next/font/google';
 import { Minus, Plus, Trash2 } from 'lucide-react';
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
+import { useDrawerState } from '../context/DrawerContext.jsx';  // Add useDrawerState
+import { useCart } from '../context/CartContext'; // Add useCart
 
 const GoldmanFont = Goldman({
     subsets: ['latin'],
@@ -16,7 +18,10 @@ const GoldmanFont = Goldman({
 });
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [drawerOpen, setDrawerOpen] = useState(false); // State to manage drawer
+  // const [drawerOpen, setDrawerOpen] = useState(false); // State to manage drawer
+  // const [cartProduct, setCartProduct] = useState([]);
+  const { drawerOpen, setDrawerOpen } = useDrawerState();
+  const { cartProduct, setCartProduct } = useCart(); // Use shared cart state
   const [drawerSearchOpen, setDrawerSearchOpen] = useState(false); // State to manage drawer
   const searchRef = useRef(null);
   const [user, setUser] = useState(null);
@@ -43,6 +48,29 @@ export default function Header() {
     router.push(destination); // For Next.js
     // Or for regular navigation: window.location.href = destination;
   };
+
+  
+  // const [cartProduct, setCartProduct] = useState([]);
+  // const { drawerOpen, setDrawerOpen } = useDrawerState();
+  
+  useEffect(() => {
+    const fetchCartProducts = () => {
+      const storedCartProduct = localStorage.getItem('cart');
+      if (storedCartProduct) {
+        try {
+          const parsedCartProduct = JSON.parse(storedCartProduct); // Parse the JSON string
+          setCartProduct(parsedCartProduct); // Update state with parsed data
+          console.log('parsed cart product:', parsedCartProduct);
+        } catch (error) {
+          console.error('Error parsing cart data:', error);
+        }
+      } else {
+        console.log('No cart data found in localStorage');
+      }
+    };
+
+    fetchCartProducts();
+  }, []);
 
   const toggleSearchDrawer = (open) => () => {
     setDrawerSearchOpen(open);
@@ -75,6 +103,7 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside, true);
     };
   }, []);
+  
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
@@ -106,98 +135,111 @@ export default function Header() {
       </div>
     </div>
   )
-  const [count, setCount] = useState(1);
-
-  const increment = () => setCount(prev => prev + 1);
-  const decrement = () => setCount(prev => Math.max(0, prev - 1));
-  const handleDelete = () => setCount(0);
-
   const cartProducts = [
     { title: "3D BOLT HOODIE - BLACK", price: 299, size: "2Y", img: "https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" },
     { title: "3D BOLT HOODIE - BLACK", price: 299, size: "2Y", img: "https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" },
     { title: "3D BOLT HOODIE - BLACK", price: 299, size: "2Y", img: "https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" },
     { title: "3D BOLT HOODIE - BLACK", price: 299, size: "2Y", img: "https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" },
-  ]
+  ] 
+
+  // Example: Implement decrement, increment, and delete (adjust as needed)
+  // Updated functions to consider both productId and selectedSize
+  const decrement = (productId, selectedSize) => {
+    const updatedCart = cartProduct.map((item) =>
+      item._id === productId && item.selectedSize === selectedSize && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
+    );
+    setCartProduct(updatedCart);
+  };
+
+  const increment = (productId, selectedSize) => {
+    const updatedCart = cartProduct.map((item) =>
+      item._id === productId && item.selectedSize === selectedSize
+        ? { ...item, quantity: item.quantity + 1 }
+        : item
+    );
+    setCartProduct(updatedCart);
+  };
+
+  const handleDelete = (productId, selectedSize) => {
+    const updatedCart = cartProduct.filter(
+      (item) => !(item._id === productId && item.selectedSize === selectedSize)
+    );
+    setCartProduct(updatedCart);
+  };
+
   const list = () => (
-    <div
-      style={{ width: 340 }}
-      role="presentation"
-    >
+    <div style={{ width: 340 }} role="presentation">
       <div className="text-gray-600 w-full pl-4 pr-2.5 py-3.5 font-light btn btn-primary flex justify-between">
-        <p className="text-xl">Shoping Cart</p>
+        <p className="text-xl">Shopping Cart</p>
         <div className="border-gray-400 pr-2">
           <X size={30} className="cursor-pointer" strokeWidth={1.5} onClick={toggleDrawer(false)} />
         </div>
       </div>
 
       <div className="overflow-auto h-[80vh]">
-        {cartProducts.length > 0 ? cartProducts.map((product, index) => (
-
-        <div key={index} className="w-full grid px-4 grid-cols-2 my-2">
-          <div className="col-span-1">
-            <img className="h-52 object-cover rounded-xl" src="https://mrbeast.store/cdn/shop/files/0091_0007_377.jpg?v=1714499554&width=1250" alt="" />
-          </div>
-
-          <div className="col-span-1 flex flex-col">
-            <p>3D BOLT HOODIE - BLACK</p>
-            <p className="pt-1 text-gray-700">299.00 DH</p>
-            <div className="my-3">
-              <hr className="border-gray-500" />
-              <div className="flex py-1.5 text-gray-600 justify-between">
-                <p>SIZE</p>
-                <p>2Y</p>
-              </div>
-              <hr className="border-gray-500" />
+        {cartProduct.length > 0 ? cartProduct.map((product, index) => (
+          <div key={index} className="w-full grid px-4 grid-cols-2 my-2">
+            <div className="col-span-1">
+              <img className="h-52 object-cover rounded-xl" src={product.mainSrc} alt="" />
             </div>
-            <p className="text-gray-700 uppercase text-xs">item sub-total</p>
-            <p className="text-gray-700 uppercase text-xs flex justify-end">598.00 DH</p>
-            <div className="flex items-center border rounded-lg w-fit">
-              <button
-                onClick={decrement}
-                className="p-2 hover:bg-gray-100 rounded-l-lg transition-colors"
-                aria-label="Decrease quantity"
-              >
-                <Minus className="w-4 h-4" />
-              </button>
-              
-              <div className="w-12 text-center border-x px-2 py-1">
-                {count}
+            <div className="col-span-1 flex flex-col">
+              <p>{product.title}</p>
+              <p className="pt-1 text-gray-700">{product.currentPrice.toFixed(2)} DH</p>
+              <div className="my-3">
+                <hr className="border-gray-500" />
+                <div className="flex py-1.5 text-gray-600 justify-between">
+                  <p>SIZE</p>
+                  <p>{product.selectedSize}</p>
+                </div>
+                <hr className="border-gray-500" />
               </div>
-              
-              <button
-                onClick={increment}
-                className="p-2 hover:bg-gray-100 transition-colors"
-                aria-label="Increase quantity"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-              
-              <button
-                onClick={handleDelete}
-                className="p-2 hover:bg-gray-100 rounded-r-lg transition-colors"
-                aria-label="Delete"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <p className="text-gray-700 uppercase text-xs">item sub-total</p>
+              <p className="text-gray-700 uppercase text-xs flex justify-end">
+                {(product.currentPrice * product.quantity).toFixed(2)} DH
+              </p>
+              <div className="flex items-center border rounded-lg w-fit">
+                <button
+                  onClick={() => decrement(product._id, product.selectedSize)}
+                  className="p-2 hover:bg-gray-100 rounded-l-lg transition-colors"
+                  aria-label="Decrease quantity"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
+                <div className="w-12 text-center border-x px-2 py-1">{product.quantity}</div>
+                <button
+                  onClick={() => increment(product._id, product.selectedSize)}
+                  className="p-2 hover:bg-gray-100 transition-colors"
+                  aria-label="Increase quantity"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleDelete(product._id, product.selectedSize)}
+                  className="p-2 hover:bg-gray-100 rounded-r-lg transition-colors"
+                  aria-label="Delete"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
-
-        </div>
-
-      )) : (
-
-        <div className="hidden h-[350px] text-gray-600 mt-9 justify-center items-center">
-          <p className="text-lg">no products in the cart</p>
-        </div>
-
-      )}
+        )) : (
+          <div className="h-[350px] text-gray-600 mt-9 flex justify-center items-center">
+            <p className="text-lg">No products in the cart</p>
+          </div>
+        )}
       </div>
 
       <div className="w-full absolute bottom-3 flex justify-center text-gray-600">
-        <Button className="uppercase px-10 py-2 rounded-full mt-36 text-gray-500 text-[17px] border-gray-400" variant="bordered">continue shopping</Button>
+        <Button className="uppercase px-10 py-2 rounded-full mt-36 text-gray-500 text-[17px] border-gray-400" variant="bordered">
+          Continue Shopping
+        </Button>
       </div>
     </div>
   );
+
 
   const menuItems = [
     "Profile",
@@ -389,7 +431,7 @@ export default function Header() {
 
       <NavbarContent className="">
         <NavbarItem onClick={toggleDrawer(true)} className="-mr-14 flex cursor-pointer relative">
-          <span className="bg-[#fff] border border-[#E74683] absolute inline-flex items-center px-1 -right-1 -top-0 font-serif rounded-full text-xs text-[#E74683]">0</span>
+          <span className="bg-[#fff] border border-[#E74683] absolute inline-flex items-center px-1 -right-1 -top-0 font-serif rounded-full text-xs text-[#E74683]">{cartProduct.length}</span>
           <div className="absolute -z-10 bg-[#E74683] top-[5px] right-0 px-5 h-8 w-10 rounded-3xl"></div>
           <svg width="42px" height="42px" fill="#ffffff" className="!fill-white rounded-xl" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
             <path d="m15.75 11.8h-3.16l-.77 11.6a5 5 0 0 0 4.99 5.34h7.38a5 5 0 0 0 4.99-5.33l-.78-11.61zm0 1h-2.22l-.71 10.67a4 4 0 0 0 3.99 4.27h7.38a4 4 0 0 0 4-4.27l-.72-10.67h-2.22v.63a4.75 4.75 0 1 1 -9.5 0zm8.5 0h-7.5v.63a3.75 3.75 0 1 0 7.5 0z" fill="#fff" fillRule="evenodd"></path>

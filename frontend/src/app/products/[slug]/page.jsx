@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { FaStar } from "react-icons/fa";
 import { Button } from "@nextui-org/react";
 import ReviewSwipper from '@/components/home/ReviewSwipper';
-
 import {
   Modal,
   ModalContent,
@@ -15,7 +14,8 @@ import {
 } from "@nextui-org/react";
 import { motion, useSpring } from 'framer-motion';
 import Loader from '@/components/Loader';
-
+import { useDrawerState } from '../../../context/DrawerContext';
+import { useCart } from '../../../context/CartContext'; // Add useCart
 
 const GoldmanFont = Goldman({
   subsets: ['latin'],
@@ -29,6 +29,9 @@ const ArchivoFont = Archivo({
 
 export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState('');
+  const { setDrawerOpen } = useDrawerState();
+  // const [cartProduct, setCartProduct] = useState([]);
+  const { cartProduct, setCartProduct } = useCart();
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState([]);
@@ -98,6 +101,83 @@ export default function ProductPage() {
   const handleActiveVarImg = (index) => {
     setSlideDirection(index > activeVarImg ? 'right' : 'left');
     setActiveVarImg(index);
+  };
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [cart, setCart] = useState([]);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await api.get('/users/me');
+        setIsAuthenticated(true);
+      } catch (err) {
+        setIsAuthenticated(false);
+      }
+    };
+    
+    checkAuth();
+  }, []);
+
+  // Load cart from localStorage on mount (for unauthenticated users)
+  useEffect(() => {
+    if (!isAuthenticated) {
+      const storedCart = localStorage.getItem('cart');
+      if (storedCart) {
+        setCart(JSON.parse(storedCart));
+      }
+    }
+  }, [isAuthenticated]);
+
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const addProductToCart = async () => {
+    try {
+      if (!selectedSize) {
+        alert('Please select a size before adding to cart.');
+        return;
+      }
+      
+      const cartItem = {
+        ...product,
+        quantity: 1,
+        selectedSize, // Include the selected size in the cart item
+      };
+
+      if (isAuthenticated) {
+        // For authenticated users, add to MongoDB via API
+        const response = await api.post('/api/cart/add', {
+          productId: product._id,
+          quantity: 1,
+          selectedSize, // Pass selectedSize to the backend
+        });
+        setCartProduct(response.data.products); // Update shared cart state
+        console.log('Product added to MongoDB cart:', response.data);
+      } else {
+        // For unauthenticated users, update cart in localStorage
+        let updatedCart = [...cartProduct];
+
+        // Check if the product with the same _id AND selectedSize already exists
+        const existingProductIndex = updatedCart.findIndex(
+          (item) => item._id === product._id && item.selectedSize === selectedSize
+        );
+
+        if (existingProductIndex !== -1) {
+          // If product with same _id and selectedSize exists, increment quantity
+          updatedCart[existingProductIndex].quantity += 1;
+        } else {
+          // Otherwise, add new cart item with the selected size
+          updatedCart.push(cartItem);
+        }
+
+        // Update shared cart state (which also syncs to localStorage via CartProvider)
+        setCartProduct(updatedCart);
+        console.log('Product added to localStorage cart:', updatedCart);
+      }
+      setDrawerOpen(true); // Open the drawer
+    } catch (err) {
+      console.error('Error adding product to cart:', err);
+      alert('Failed to add product to cart. Please try again.');
+    }
   };
 
   return (
@@ -203,7 +283,7 @@ export default function ProductPage() {
 
               <p className={`mt-3 ${product?.stock <= 50 ? 'text-red-500' : 'hidden'}`}>Very Low Stock:  {product.stock}  UNITS LEFT </p>
 
-              <Button color="primary" className="animate-shake rounded-lg my-4 w-full">ADD TO CART</Button>
+              <Button onPress={addProductToCart} color="primary" className="animate-shake rounded-lg my-4 w-full">ADD TO CART</Button>
             </div>
           </div>
         </div>
