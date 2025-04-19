@@ -28,6 +28,8 @@ export const metadata = {
 
 import { DrawerStateProvider } from '../context/DrawerContext';
 import { CartProvider } from '../context/CartContext';
+import CartSync from '../components/CartSync';
+import { AuthProvider } from '../context/AuthContext';
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -35,11 +37,14 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} ${GoldmanFont.className} antialiased`}
       >
         <DrawerStateProvider>
-          <CartProvider>
-            <Header />
-            <main>{children}</main>
-            <Footer />
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <CartSync />
+                <Header />
+                  <main>{children}</main>
+                <Footer />
+            </CartProvider>
+          </AuthProvider>
         </DrawerStateProvider>
       </body>
     </html>
