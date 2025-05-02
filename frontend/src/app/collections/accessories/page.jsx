@@ -697,8 +697,8 @@ const All = () => {
                           <div className="space-y-2 p-2">
                               <p className="pt-2 cursor-pointer TextCardHover">{product.title}</p>
                               <div className="flex gap-3">
-                                  <p className="text-gray-800 line-through">{product?.regularPrice?.toFixed(2) || '0.00'} dh</p>
-                                  <p className="text-black ">{product?.currentPrice?.toFixed(2) || '0.00'} dh</p>
+                                  <p className="text-gray-800 line-through">{product?.regularPrice?.toFixed(2)} dh</p>
+                                  <p className="text-black ">{product?.currentPrice?.toFixed(2)} dh</p>
                                   <p className="text-[#E74683] mt-[1px]">{product.discount}% OFF</p>
                               </div>
                           </div>

@@ -7,13 +7,15 @@ import { Button } from "@nextui-org/react";
 import { useRouter } from 'next/navigation';
 import Link from "next/link";
 import Swal from 'sweetalert2';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Loader from "@/components/Loader";
+import { useAuth } from '../../context/AuthContext'; // Import Auth context
 
 export default function Login() {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { setIsAuthenticated } = useAuth(); // Get setIsAuthenticated from Auth context
 
   const [formData, setFormData] = useState({
     email: '',
@@ -56,6 +58,9 @@ export default function Login() {
 
       // Store the token (e.g., in localStorage or a state management solution)
       localStorage.setItem('token', token);
+      
+      // Update authentication state in context
+      setIsAuthenticated(true);
 
       // Show success toast
       Toast.fire({
@@ -63,7 +68,13 @@ export default function Login() {
         title: "Logged in successfully"
       });
 
-      // Redirect to a protected page (e.g., dashboard)
+      // Force page refresh to ensure cart sync
+      setTimeout(() => {
+        window.location.reload();
+      }, 500); // Small delay to ensure the toast is visible
+
+      // Redirect will happen after reload
+      // If you want to keep the redirect, it will still work after the reload
       router.push('/account/index');
     } catch (err) {
       const errorMessage = err.response?.data?.message || 'Error while signing in';
@@ -126,7 +137,7 @@ export default function Login() {
         </form>
       </Card>
       <div className="mt-4">
-        <span className="text-sm">Don’t have an account? </span>
+        <span className="text-sm">Don't have an account? </span>
         <Link href="/signup" className="text-sm text-blue-500" prefetch={false}>
           Sign up
         </Link>

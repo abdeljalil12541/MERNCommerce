@@ -186,7 +186,7 @@ export default function Header() {
             </div>
             <div className="col-span-1 flex flex-col">
               <p>{product.title}</p>
-              <p className="pt-1 text-gray-700">{product.currentPrice.toFixed(2)} DH</p>
+              <p className="pt-1 text-gray-700">{product?.currentPrice?.toFixed(2)} DH</p>
               <div className="my-3">
                 <hr className="border-gray-500" />
                 <div className="flex py-1.5 text-gray-600 justify-between">
@@ -197,7 +197,7 @@ export default function Header() {
               </div>
               <p className="text-gray-700 uppercase text-xs">item sub-total</p>
               <p className="text-gray-700 uppercase text-xs flex justify-end">
-                {(product.currentPrice * product.quantity).toFixed(2)} DH
+                {(product?.currentPrice * product?.quantity).toFixed(2)} DH
               </p>
               <div className="flex items-center border rounded-lg w-fit">
                 <button

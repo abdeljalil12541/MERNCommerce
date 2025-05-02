@@ -1,4 +1,3 @@
-// frontend/src/context/AuthContext.jsx
 "use client";
 import { createContext, useContext, useState, useEffect } from 'react';
 import api from '../lib/api';
@@ -13,7 +12,7 @@ const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     if (token) {
       setIsAuthenticated(true);
-      // Optionally fetch user data if needed
+      // Fetch user data if needed
       api.get('/users/me', {
         headers: { Authorization: `Bearer ${token}` },
       })
@@ -28,6 +27,27 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  const login = async (credentials) => {
+    try {
+      const response = await api.post('/auth/login', credentials);
+      const { token, user } = response.data;
+      
+      localStorage.setItem('token', token);
+      setUser(user);
+      setIsAuthenticated(true);
+      
+      // Force a page refresh to ensure all components update with new auth state
+      window.location.reload();
+      
+      return { success: true };
+    } catch (error) {
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Login failed'
+      };
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
     setIsAuthenticated(false);
@@ -35,7 +55,13 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, setIsAuthenticated, logout }}>
+    <AuthContext.Provider value={{ 
+      isAuthenticated, 
+      user, 
+      setIsAuthenticated, 
+      login,
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

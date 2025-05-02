@@ -1,13 +1,14 @@
-// src/context/CartContext.js
 "use client";
 import { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './AuthContext'; // Import Auth context
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cartProduct, setCartProduct] = useState([]);
+  const { isAuthenticated } = useAuth(); // Get authentication state
 
-  // Load cart from localStorage on mount
+  // Load cart from localStorage only on initial mount
   useEffect(() => {
     const storedCart = localStorage.getItem('cart');
     if (storedCart) {
@@ -15,10 +16,12 @@ export function CartProvider({ children }) {
     }
   }, []);
 
-  // Sync localStorage whenever cartProduct changes
+  // Sync localStorage whenever cartProduct changes, but only if not authenticated
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cartProduct));
-  }, [cartProduct]);
+    if (!isAuthenticated) {
+      localStorage.setItem('cart', JSON.stringify(cartProduct));
+    }
+  }, [cartProduct, isAuthenticated]);
 
   return (
     <CartContext.Provider value={{ cartProduct, setCartProduct }}>
