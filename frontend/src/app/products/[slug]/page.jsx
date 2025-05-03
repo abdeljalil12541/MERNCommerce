@@ -16,6 +16,7 @@ import { motion, useSpring } from 'framer-motion';
 import Loader from '@/components/Loader';
 import { useDrawerState } from '../../../context/DrawerContext';
 import { useCart } from '../../../context/CartContext'; // Add useCart
+import api from '@/lib/api';
 
 const GoldmanFont = Goldman({
   subsets: ['latin'],
@@ -145,7 +146,7 @@ export default function ProductPage() {
 
       if (isAuthenticated) {
         // For authenticated users, add to MongoDB via API
-        const response = await api.post('/api/cart/add', {
+        const response = await api.post('/cart/add', {
           productId: product._id,
           quantity: 1,
           selectedSize, // Pass selectedSize to the backend

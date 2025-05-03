@@ -62,7 +62,7 @@ export default function Header() {
           setCartProduct(parsedCartProduct); // Update state with parsed data
           console.log('parsed cart product:', parsedCartProduct);
         } catch (error) {
-          console.error('Error parsing cart data:', error);
+          console.log('Error parsing cart data:', error);
         }
       } else {
         console.log('No cart data found in localStorage');
@@ -143,31 +143,136 @@ export default function Header() {
   ] 
 
   // Example: Implement decrement, increment, and delete (adjust as needed)
-  // Updated functions to consider both productId and selectedSize
-  const decrement = (productId, selectedSize) => {
-    const updatedCart = cartProduct.map((item) =>
-      item._id === productId && item.selectedSize === selectedSize && item.quantity > 1
-        ? { ...item, quantity: item.quantity - 1 }
-        : item
-    );
-    setCartProduct(updatedCart);
-  };
+  // Updated cart management functions
 
-  const increment = (productId, selectedSize) => {
+// Updated increment function with fixed API path
+const increment = async (productId, selectedSize) => {
+  try {
+    // Find current item to get its quantity
+    const currentItem = cartProduct.find(
+      item => item.productId._id === productId && item.selectedSize === selectedSize
+    );
+    
+    if (!currentItem) return;
+    
+    const newQuantity = currentItem.quantity + 1;
+    
+    // If authenticated, update in MongoDB first
+    if (isAuthenticated) {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      // Check URL path first - log it for debugging
+      console.log('Sending request to update quantity at path:', '/cart/update-quantity');
+      
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const response = await api.post('/cart/update-quantity', {
+        productId: currentItem.productId._id,
+        selectedSize,
+        quantity: newQuantity
+      }, config);
+      
+      // Update cart from response
+      if (response.data && response.data.products) {
+        setCartProduct(response.data.products);
+        return; // Exit early as the state is already updated
+      }
+    }
+    
+    // If not authenticated or API call failed, update local state
     const updatedCart = cartProduct.map((item) =>
-      item._id === productId && item.selectedSize === selectedSize
+      item.productId._id === productId && item.selectedSize === selectedSize
         ? { ...item, quantity: item.quantity + 1 }
         : item
     );
     setCartProduct(updatedCart);
-  };
+  } catch (err) {
+    console.error('Error increasing quantity:', err);
+    console.log('Error details:', err.response?.data || err.message);
+    toast?.error('Failed to update cart. Please try again.') || alert('Failed to update cart. Please try again.');
+  }
+};
 
-  const handleDelete = (productId, selectedSize) => {
-    const updatedCart = cartProduct.filter(
-      (item) => !(item._id === productId && item.selectedSize === selectedSize)
+// Updated decrement function with fixed API path
+const decrement = async (productId, selectedSize) => {
+  try {
+    // Find current item to get its quantity
+    const currentItem = cartProduct.find(
+      item => item.productId._id === productId && item.selectedSize === selectedSize
+    );
+    
+    if (!currentItem) return;
+    
+    const newQuantity = currentItem.quantity > 1 ? currentItem.quantity - 1 : 1;
+    
+    // If authenticated, update in MongoDB first
+    if (isAuthenticated) {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+
+      const response = await api.post('/cart/update-quantity', {
+        productId: currentItem.productId._id,
+        selectedSize,
+        quantity: newQuantity
+      }, config);
+      
+      // Update cart from response
+      if (response.data && response.data.products) {
+        setCartProduct(response.data.products);
+        return; // Exit early as the state is already updated
+      }
+    }
+    
+    // If not authenticated or API call failed, update local state
+    const updatedCart = cartProduct.map((item) =>
+      item.productId._id === productId && item.selectedSize === selectedSize && item.quantity > 1
+        ? { ...item, quantity: item.quantity - 1 }
+        : item
     );
     setCartProduct(updatedCart);
-  };
+  } catch (err) {
+    console.error('Error decreasing quantity:', err);
+    console.log('Error details:', err.response?.data || err.message);
+    toast?.error('Failed to update cart. Please try again.') || alert('Failed to update cart. Please try again.');
+  }
+};
+
+// Updated handleDelete function with fixed API path
+const handleDelete = async (productId, selectedSize) => {
+  try {
+    // If authenticated, remove from MongoDB first
+    if (isAuthenticated) {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      // FIXED PATH: Removed '/api' prefix to match backend routes
+      const response = await api.post('/cart/remove-item', {
+        productId,
+        selectedSize
+      }, config);
+      
+      // Update cart from response
+      if (response.data && response.data.products) {
+        setCartProduct(response.data.products);
+        return; // Exit early as the state is already updated
+      }
+    }
+    
+    // If not authenticated or API call failed, update local state
+    const updatedCart = cartProduct.filter(
+      (item) => !(item.productId._id === productId && item.selectedSize === selectedSize)
+    );
+    setCartProduct(updatedCart);
+  } catch (err) {
+    console.error('Error removing item from cart:', err);
+    console.log('Error details:', err.response?.data || err.message);
+    toast?.error('Failed to remove item from cart. Please try again.') || alert('Failed to remove item from cart. Please try again.');
+  }
+};
 
   const list = () => (
     <div style={{ width: 340 }} role="presentation">
@@ -182,11 +287,11 @@ export default function Header() {
         {cartProduct.length > 0 ? cartProduct.map((product, index) => (
           <div key={index} className="w-full grid px-4 grid-cols-2 my-2">
             <div className="col-span-1">
-              <img className="h-52 object-cover rounded-xl" src={product.mainSrc} alt="" />
+              <img className="h-52 object-cover rounded-xl" src={product?.mainSrc || (product?.productId && product.productId.mainSrc)} alt="" />
             </div>
             <div className="col-span-1 flex flex-col">
               <p>{product.title}</p>
-              <p className="pt-1 text-gray-700">{product?.currentPrice?.toFixed(2)} DH</p>
+              <p className="pt-1 text-gray-700">{product?.currentPrice?.toFixed(2) || (product?.productId && product.productId.currentPrice.toFixed(2))} DH</p>
               <div className="my-3">
                 <hr className="border-gray-500" />
                 <div className="flex py-1.5 text-gray-600 justify-between">
@@ -197,31 +302,38 @@ export default function Header() {
               </div>
               <p className="text-gray-700 uppercase text-xs">item sub-total</p>
               <p className="text-gray-700 uppercase text-xs flex justify-end">
-                {(product?.currentPrice * product?.quantity).toFixed(2)} DH
+                {Number(
+                  product?.currentPrice && product?.quantity 
+                    ? (product.currentPrice * product.quantity).toFixed(2)
+                    : product?.productId?.currentPrice && product?.quantity
+                      ? (product.productId.currentPrice * product.quantity).toFixed(2)
+                      : 0
+                  ).toLocaleString()
+                } DH
               </p>
               <div className="flex items-center border rounded-lg w-fit">
-                <button
-                  onClick={() => decrement(product._id, product.selectedSize)}
-                  className="p-2 hover:bg-gray-100 rounded-l-lg transition-colors"
-                  aria-label="Decrease quantity"
-                >
-                  <Minus className="w-4 h-4" />
-                </button>
-                <div className="w-12 text-center border-x px-2 py-1">{product.quantity}</div>
-                <button
-                  onClick={() => increment(product._id, product.selectedSize)}
-                  className="p-2 hover:bg-gray-100 transition-colors"
-                  aria-label="Increase quantity"
-                >
-                  <Plus className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => handleDelete(product._id, product.selectedSize)}
-                  className="p-2 hover:bg-gray-100 rounded-r-lg transition-colors"
-                  aria-label="Delete"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              <button
+                onClick={() => decrement(product.productId._id, product.selectedSize)}
+                className="p-2 hover:bg-gray-100 rounded-l-lg transition-colors"
+                aria-label="Decrease quantity"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+              <div className="w-12 text-center border-x px-2 py-1">{product.quantity}</div>
+              <button
+                onClick={() => increment(product.productId._id, product.selectedSize)}
+                className="p-2 hover:bg-gray-100 transition-colors"
+                aria-label="Increase quantity"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDelete(product.productId._id, product.selectedSize)}
+                className="p-2 hover:bg-gray-100 rounded-r-lg transition-colors"
+                aria-label="Delete"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
               </div>
             </div>
           </div>

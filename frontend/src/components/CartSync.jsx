@@ -6,92 +6,116 @@ import api from '../lib/api';
 
 const CartSync = () => {
   const { isAuthenticated, logout } = useAuth();
-  const { cartProduct, setCartProduct } = useCart();
+  const { cartProduct, setCartProduct, forceSync } = useCart(); // Added forceSync from updated CartContext
   const [isSyncing, setIsSyncing] = useState(false);
+  const [hasSynced, setHasSynced] = useState(false);
 
-  useEffect(() => {
-    if (isAuthenticated && cartProduct.length > 0 && !isSyncing) {
-      const syncLocalCartToMongoDB = async () => {
-        setIsSyncing(true);
-        try {
-          // Get the token
-          const token = localStorage.getItem('token');
-          if (!token) {
-            console.log('No token found');
-            setIsSyncing(false);
-            return;
-          }
+  // Function to fetch cart from MongoDB
+  const fetchMongoDBCart = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return null;
 
-          // Setup authorization header
-          const config = {
-            headers: { Authorization: `Bearer ${token}` },
-          };
-
-          // Fetch the current MongoDB cart
-          const response = await api.get('/cart', config);
-          const mongoCart = response.data.products || [];
-
-          // Validate and filter localStorage items
-          const itemsToAdd = cartProduct.filter((localItem) => {
-            const isValid = localItem._id && localItem.quantity > 0 && localItem.selectedSize;
-            if (!isValid) {
-              console.warn('Invalid item skipped:', localItem);
-              return false;
-            }
-            // Check if item already exists in MongoDB cart
-            return !mongoCart.some(
-              (mongoItem) =>
-                mongoItem.productId._id.toString() === localItem._id.toString() &&
-                mongoItem.selectedSize === localItem.selectedSize
-            );
-          });
-
-          // Add only new items to MongoDB
-          for (const item of itemsToAdd) {
-            try {
-              await api.post(
-                '/cart/add',
-                {
-                  productId: item._id,
-                  quantity: item.quantity,
-                  selectedSize: item.selectedSize,
-                },
-                config
-              );
-            } catch (itemError) {
-              console.error('Failed to add item:', itemError.response?.data || itemError.message);
-              // Continue with other items instead of failing the entire sync
-            }
-          }
-
-          // Clear localStorage after attempting sync
-          localStorage.removeItem('cart');
-
-          // Refresh the MongoDB cart and update context
-          const updatedCartResponse = await api.get('/cart', config);
-          setCartProduct(updatedCartResponse.data.products || []);
-          console.log('LocalStorage cart synced to MongoDB');
-        } catch (err) {
-          console.log('Error syncing cart:', err.response?.data || err.message);
-          if (err.response?.status === 401) {
-            alert('Authentication failed. Please log in again.');
-            localStorage.removeItem('token');
-            localStorage.removeItem('cart');
-            logout();
-          } else if (err.response?.status === 400) {
-            alert('Invalid cart item data. Please clear your cart and try again.');
-            localStorage.removeItem('cart');
-          } else {
-            alert('Failed to sync cart. Please try again later.');
-          }
-        } finally {
-          setIsSyncing(false);
-        }
-      };
-
-      syncLocalCartToMongoDB();
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await api.get('/cart', config);
+      return response.data;
+    } catch (err) {
+      console.error('Error fetching cart:', err);
+      if (err.response?.status === 401) {
+        logout();
+      }
+      return null;
     }
-  }, [isAuthenticated, cartProduct, setCartProduct, logout]);
+  };
+
+  // Sync local cart to MongoDB
+  const syncToMongoDB = async () => {
+    if (!isAuthenticated || isSyncing) return;
+    
+    setIsSyncing(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        setIsSyncing(false);
+        return;
+      }
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await api.get('/cart', config);
+      const mongoCart = response.data.products || [];
+
+      // Get local cart items
+      const localCart = JSON.parse(localStorage.getItem('cart') || '[]');
+      
+      // Find unique items to add
+      const itemsToAdd = localCart.filter((localItem) => {
+        const isValid = localItem._id && localItem.quantity > 0 && localItem.selectedSize;
+        if (!isValid) return false;
+        
+        return !mongoCart.some(
+          (mongoItem) =>
+            mongoItem.productId._id.toString() === localItem._id.toString() &&
+            mongoItem.selectedSize === localItem.selectedSize
+        );
+      });
+
+      // Add items to MongoDB
+      for (const item of itemsToAdd) {
+        try {
+          await api.post(
+            '/cart/add',
+            {
+              productId: item._id,
+              quantity: item.quantity,
+              selectedSize: item.selectedSize,
+            },
+            config
+          );
+        } catch (itemError) {
+          console.error('Failed to add item:', itemError);
+        }
+      }
+
+      // Clear localStorage cart
+      localStorage.removeItem('cart');
+      
+      // Fetch updated cart from MongoDB
+      const updatedCart = await fetchMongoDBCart();
+      if (updatedCart) {
+        setCartProduct(updatedCart.products || []);
+      }
+      
+      setHasSynced(true);
+      console.log('Cart synced successfully');
+    } catch (err) {
+      console.error('Sync error:', err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
+  // Sync when authenticated with local cart items
+  useEffect(() => {
+    if (isAuthenticated && !hasSynced && cartProduct.length > 0) {
+      syncToMongoDB();
+    }
+  }, [isAuthenticated, hasSynced, cartProduct.length]);
+
+  // Reset sync flag when logged out
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setHasSynced(false);
+    }
+  }, [isAuthenticated]);
+
+  // Handle forced sync requests from CartContext
+  useEffect(() => {
+    if (forceSync && isAuthenticated) {
+      // Reset hasSynced to allow a new sync
+      setHasSynced(false);
+    }
+  }, [forceSync, isAuthenticated]);
 
   return null;
 };
