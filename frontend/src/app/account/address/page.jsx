@@ -57,8 +57,8 @@ export default function EditAddress() {
           console.log("No addresses available in response");
         }
       } catch (err) {
-        console.error("Error fetching user data:", err);
-        console.error("Error details:", err.response?.data || err.message);
+        console.log("Error fetching user data:", err);
+        console.log("Error details:", err.response?.data || err.message);
         setError("Failed to load user data");
         Toast.fire({
           icon: "error",
@@ -86,8 +86,8 @@ export default function EditAddress() {
         title: "Address updated successfully",
       });
     } catch (err) {
-      console.error("Error submitting address:", err);
-      console.error("Submit error details:", err.response?.data || err.message);
+      console.log("Error submitting address:", err);
+      console.log("Submit error details:", err.response?.data || err.message);
       Toast.fire({
         icon: "error",
         title: "Failed to update address",

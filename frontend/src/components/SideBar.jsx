@@ -82,7 +82,7 @@ export default function SideBar() {
       });
       router.push("/login");
     } catch (error) {
-      console.error("Error while logging out...", error);
+      console.log("Error while logging out...", error);
       Toast.fire({
         icon: "error",
         title: "Failed to log out",

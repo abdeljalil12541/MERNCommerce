@@ -23,7 +23,7 @@ export function CartProvider({ children }) {
           const response = await api.get('/cart', config);
           setCartProduct(response.data.products || []);
         } catch (err) {
-          console.error('Failed to load cart from MongoDB:', err);
+          console.log('Failed to load cart from MongoDB:', err);
         }
       } 
       // If not authenticated, load from localStorage

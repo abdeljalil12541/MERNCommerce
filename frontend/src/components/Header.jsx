@@ -188,7 +188,7 @@ const increment = async (productId, selectedSize) => {
     );
     setCartProduct(updatedCart);
   } catch (err) {
-    console.error('Error increasing quantity:', err);
+    console.log('Error increasing quantity:', err);
     console.log('Error details:', err.response?.data || err.message);
     toast?.error('Failed to update cart. Please try again.') || alert('Failed to update cart. Please try again.');
   }
@@ -234,7 +234,7 @@ const decrement = async (productId, selectedSize) => {
     );
     setCartProduct(updatedCart);
   } catch (err) {
-    console.error('Error decreasing quantity:', err);
+    console.log('Error decreasing quantity:', err);
     console.log('Error details:', err.response?.data || err.message);
     toast?.error('Failed to update cart. Please try again.') || alert('Failed to update cart. Please try again.');
   }
@@ -268,7 +268,7 @@ const handleDelete = async (productId, selectedSize) => {
     );
     setCartProduct(updatedCart);
   } catch (err) {
-    console.error('Error removing item from cart:', err);
+    console.log('Error removing item from cart:', err);
     console.log('Error details:', err.response?.data || err.message);
     toast?.error('Failed to remove item from cart. Please try again.') || alert('Failed to remove item from cart. Please try again.');
   }
@@ -346,7 +346,7 @@ const handleDelete = async (productId, selectedSize) => {
 
       <div className="w-full absolute bottom-3 flex justify-center text-gray-600">
         <Button className="uppercase px-10 py-2 rounded-full mt-36 text-gray-500 text-[17px] border-gray-400" variant="bordered">
-          Continue Shopping
+          {cartProduct.length > 0 ? 'Go to cart' : 'Continue Shopping'}
         </Button>
       </div>
     </div>

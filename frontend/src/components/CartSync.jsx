@@ -20,7 +20,7 @@ const CartSync = () => {
       const response = await api.get('/cart', config);
       return response.data;
     } catch (err) {
-      console.error('Error fetching cart:', err);
+      console.log('Error fetching cart:', err);
       if (err.response?.status === 401) {
         logout();
       }
@@ -73,7 +73,7 @@ const CartSync = () => {
             config
           );
         } catch (itemError) {
-          console.error('Failed to add item:', itemError);
+          console.log('Failed to add item:', itemError);
         }
       }
 
@@ -89,7 +89,7 @@ const CartSync = () => {
       setHasSynced(true);
       console.log('Cart synced successfully');
     } catch (err) {
-      console.error('Sync error:', err);
+      console.log('Sync error:', err);
     } finally {
       setIsSyncing(false);
     }

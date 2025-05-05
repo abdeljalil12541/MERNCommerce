@@ -176,7 +176,7 @@ export default function ProductPage() {
       }
       setDrawerOpen(true); // Open the drawer
     } catch (err) {
-      console.error('Error adding product to cart:', err);
+      console.log('Error adding product to cart:', err);
       alert('Failed to add product to cart. Please try again.');
     }
   };
