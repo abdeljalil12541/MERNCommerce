@@ -247,11 +247,19 @@ const Checkout = () => {
                     className="w-16 object-cover h-16 mr-4 rounded"
                   />
                   <div>
-                    <div className="font-semibold">{item?.title || (item?.productId && item.productId.title)}</div>
+                    <div className="font-semibold">{item?.title || (item?.productId && item.productId.title)} <span className='text-gray-400 font-sans'>{item?.quantity === 1 ? null : `×${item?.quantity}`}</span></div>
                     <div className="text-gray-500">{item.selectedSize}</div>
                   </div>
                 </div>
-                <div className="font-semibold">${item?.currentPrice?.toFixed(2) || (item?.productId && item.productId.currentPrice.toFixed(2))}</div>
+                <div className="font-semibold">
+                  ${(
+                    item?.currentPrice != null && item?.quantity != null
+                      ? (Number(item.currentPrice) * Number(item.quantity)).toFixed(2)
+                      : item?.productId
+                        ? (item.productId.currentPrice * item.quantity).toFixed(2)
+                        : '0.00'
+                  )}
+                </div>
               </div>
             ))}
           </CardBody>
@@ -274,7 +282,7 @@ const Checkout = () => {
                       <div className="text-gray-500">{item.size}</div>
                     </div>
                   </div>
-                  <Button color="primary">
+                  <Button className='ml-2' color="primary">
                     Add • ${item.price.toFixed(2)}
                   </Button>
                 </div>
