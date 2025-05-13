@@ -13,7 +13,18 @@ import {
 import Stepper from 'react-stepper-horizontal';
 import { useCart } from '@/context/CartContext';
 import countries from '../../countries-list/countries.json';
-import StripeCheckout from '../../components/payment/StripeCheckout';
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+  Elements
+} from '@stripe/react-stripe-js';
+import CheckoutPage from '@/components/payment/StripeCheckout';
+import { loadStripe } from '@stripe/stripe-js';
+import convertToSubcurrency from '@/lib/convetToSubcurrency';
+
+
+const stripePromise = loadStripe('pk_test_51OpZiJFHs1GmgtcbJ0jbzfsHMriJb4XHRammGCq7fuZplZ9TFshdUeJCf6RBXjj6QymUIvI3ysgk1v9CtN5gqRch00oCzByb2Y')
 
 const Checkout = () => {
   const [countryList, setCountryList] = useState([]);
@@ -29,14 +40,10 @@ const Checkout = () => {
     city: '',
     state: '',
     zipCode: '',
-    cardNumber: '',
-    cardExpiry: '',
-    cardCVC: ''
   });
-  const [orderTotal, setOrderTotal] = useState('99.99');
-  const [paymentStatus, setPaymentStatus] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [hasPaymentAttempted, setHasPaymentAttempted] = useState(false);
+
+  const { cartProduct, setCartProduct } = useCart();
+  
 
   useEffect(() => {
     const getCountries = async () => {
@@ -60,7 +67,7 @@ const Checkout = () => {
           setSelectedCountry(moroccoKey);
         }
       } catch (error) {
-        console.error('Error loading local file, fetching from API instead:', error);
+        console.log('Error loading local file, fetching from API instead:', error);
 
         try {
           const response = await fetch('https://restcountries.com/v3.1/all');
@@ -93,60 +100,13 @@ const Checkout = () => {
             setSelectedCountry(moroccoKey);
           }
         } catch (apiError) {
-          console.error('Error fetching from API:', apiError);
+          console.log('Error fetching from API:', apiError);
         }
       }
     };
 
     getCountries();
   }, []);
-
-  const { cartProduct, setCartProduct } = useCart();
-  console.log('cart product in checkouts page: ', cartProduct);
-  const cartItems = [
-    {
-      name: 'KIDS BEAST GAMES COLOR BLOCK HOODIE',
-      size: '6Y / Blue',
-      price: 948.00,
-      image: 'https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927'
-    },
-    {
-      name: '3D BOLT HOODIE - BLACK',
-      size: 'XXS/Y12 / Black',
-      price: 842.00,
-      image: 'https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927'
-    },
-    {
-      name: '3D BOLT HOODIE - BLACK',
-      size: 'XXS/Y12 / Black',
-      price: 842.00,
-      image: 'https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927'
-    },
-    {
-      name: '3D BOLT HOODIE - BLACK',
-      size: 'XXS/Y12 / Black',
-      price: 842.00,
-      image: 'https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927'
-    },
-    {
-      name: '3D BOLT HOODIE - BLACK',
-      size: 'XXS/Y12 / Black',
-      price: 842.00,
-      image: 'https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927'
-    },
-    {
-      name: '3D BOLT HOODIE - BLACK',
-      size: 'XXS/Y12 / Black',
-      price: 842.00,
-      image: 'https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927'
-    },
-    {
-      name: 'INVESTOR 3M REFLECTIVE HOODIE - BLACK',
-      size: 'Y16',
-      price: 316.00,
-      image: 'https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927'
-    }
-  ];
 
   const recommendedItems = [
     {
@@ -177,103 +137,17 @@ const Checkout = () => {
     }));
   };
 
-  const handlePaymentSuccess = (paymentIntent) => {
-    setIsProcessing(true);
-    console.log('Payment successful!', paymentIntent);
-    setTimeout(() => {
-      setPaymentStatus({
-        success: true,
-        message: 'Payment completed successfully!',
-        paymentId: paymentIntent.id,
-      });
-      setIsProcessing(false);
-      setHasPaymentAttempted(true);
-      setCartProduct([]);
-    }, 1000);
-  };
-  
-  const handlePaymentError = (error) => {
-    console.error('Payment error:', error);
-    setPaymentStatus({
-      success: false,
-      message: `Payment failed: ${error.message || 'Unknown error'}`,
-    });
-    setHasPaymentAttempted(true);
-  };
 
-  const handlePaymentCancel = () => {
-    setPaymentStatus({
-      success: false,
-      message: 'Payment was cancelled.',
-    });
-    setHasPaymentAttempted(true);
-  };
-
+  const amount = 49.00
   return (
     <div className="mx-auto p-6">
-      {paymentStatus?.success ? (
-        <div className="max-w-md mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-6">Order Confirmation</h1>
-          <div className="bg-green-100 text-green-800 p-4 rounded-lg mb-6">
-            <p className="font-medium">{paymentStatus.message}</p>
-            {paymentStatus.paymentId && (
-              <p className="text-sm mt-1">Payment ID: {paymentStatus.paymentId}</p>
-            )}
-          </div>
-          <div className="text-center">
-            <p className="mb-4">Thank you for your purchase!</p>
-            <Button color="primary" onClick={() => window.location.href = '/'}>
-              Return to Home
-            </Button>
-          </div>
-        </div>
-      ) : (
-        <>
-          <div className="max-w-md mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">Checkout</h1>
-            
-            <div className="bg-gray-50 p-4 rounded-lg mb-6">
-              <h2 className="text-lg font-semibold mb-2">Order Summary</h2>
-              <div className="flex justify-between mb-2">
-                <span>Subtotal:</span>
-                <span>${orderTotal}</span>
-              </div>
-              <div className="flex justify-between font-bold">
-                <span>Total:</span>
-                <span>${orderTotal}</span>
-              </div>
-            </div>
-            
-            {paymentStatus && (
-              <div className={`p-4 mb-4 rounded-lg ${paymentStatus.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                <p className="font-medium">{paymentStatus.message}</p>
-                {paymentStatus.paymentId && (
-                  <p className="text-sm mt-1">Payment ID: {paymentStatus.paymentId}</p>
-                )}
-              </div>
-            )}
-            
-            {isProcessing && (
-              <div className="flex justify-center items-center p-4 mb-4">
-                <div className="spinner border-4 border-t-4 border-gray-200 rounded-full w-8 h-8 animate-spin mr-2"></div>
-                <span>Processing your payment...</span>
-              </div>
-            )}
-            
-            {!hasPaymentAttempted && !isProcessing && (
-              <div className="border rounded-lg p-4 mb-4">
-                <h3 className="font-medium mb-4">Pay with Card</h3>
-                <StripeCheckout
-                  amount={orderTotal}
-                  currency="USD"
-                  onPaymentSuccess={handlePaymentSuccess}
-                  onPaymentError={handlePaymentError}
-                  onPaymentCancel={handlePaymentCancel}
-                />
-              </div>
-            )}
-          </div>
-
+          <Elements stripe={stripePromise} options={{ 
+            mode: "payment",
+            amount: convertToSubcurrency(amount),
+            currency: "usd"
+           }}>
+            <CheckoutPage amount={amount} />
+          </Elements>
           <div className='-mt-8 mb-8'>
             <Stepper steps={[{title: 'Shopping Cart'}, {title: 'Checkout'}, {title: 'Confirmation'}]} activeStep={1} defaultColor="#E0E0E0" completeColor="#E74683" activeColor="#E74683" />
           </div>
@@ -312,6 +186,7 @@ const Checkout = () => {
                         type="text" 
                         label="Last Name" 
                         name="lastName"
+                        value={formData.lastName}
                         onChange={handleInputChange}
                         required
                       />
@@ -387,7 +262,7 @@ const Checkout = () => {
             <Card>
               <CardHeader>Order Summary</CardHeader>
               <CardBody className='h-96'>
-                {cartProduct.map((item, index) => (
+                {Array.isArray(cartProduct) && cartProduct.length > 0 ? cartProduct.map((item, index) => (
                   <div 
                     key={index} 
                     className="flex justify-between items-center mb-4"
@@ -413,7 +288,11 @@ const Checkout = () => {
                       )}
                     </div>
                   </div>
-                ))}
+                )) : (
+                  <div className="text-center text-gray-500 py-4">
+                    No items in cart
+                  </div>
+                )}
               </CardBody>
               <CardFooter>
                 <div>
@@ -421,7 +300,7 @@ const Checkout = () => {
                   {recommendedItems.map((item, index) => (
                     <div 
                       key={index} 
-                      className="flex justify-between items-center"
+                      className="flex justify-between items-center mb-4"
                     >
                       <div className="flex items-center">
                         <img 
@@ -443,8 +322,6 @@ const Checkout = () => {
               </CardFooter>
             </Card>
           </div>
-        </>
-      )}
     </div>
   );
 };

@@ -1,140 +1,95 @@
-// File: src/components/payment/StripeCheckout.jsx
-
-import React, { useState, useEffect } from 'react';
+const stripePromise = loadStripe('pk_test_51OpZiJFHs1GmgtcbJ0jbzfsHMriJb4XHRammGCq7fuZplZ9TFshdUeJCf6RBXjj6QymUIvI3ysgk1v9CtN5gqRch00oCzByb2Y')
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+  Elements
+} from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import convetToSubcurrency from '@/lib/convetToSubcurrency';
+import { useEffect, useState } from 'react';
+import api from '@/lib/api';
+import convertToSubcurrency from '@/lib/convetToSubcurrency';
+import { Button } from '@nextui-org/react';
 
-// Initialize Stripe with your publishable key
-const stripePromise = loadStripe('pk_test_51M8...'); // Replace with your Stripe publishable key
+function CheckoutPage({ amount }) {
+  const stripe = useStripe();
+  const elements = useElements();
 
-const StripeCheckout = ({ amount, currency = "USD", onPaymentSuccess, onPaymentError, onPaymentCancel }) => {
-  const [clientSecret, setClientSecret] = useState(null);
-  const [error, setError] = useState(null);
+
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Fetch the Payment Intent client secret from your backend
-    const fetchPaymentIntent = async () => {
+    const fetchClientSecret = async () => {
       try {
-        const response = await fetch('/api/create-payment-intent', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ amount }),
+        const res = await api.post('/create-payment-intent', {
+          amount: convertToSubcurrency(amount), // cents
         });
-
-        if (!response.ok) {
-          throw new Error('Failed to connect to payment server. Please ensure the backend is running.');
-        }
-
-        const data = await response.json();
-        if (data.error) {
-          throw new Error(data.error);
-        }
-        setClientSecret(data.clientSecret);
+        setClientSecret(res.data.clientSecret);
       } catch (err) {
-        setError(err.message);
-        onPaymentError(err);
+        console.log("Failed to get client secret", err);
       }
     };
+  
+    fetchClientSecret();
+  }, [amount]);
 
-    fetchPaymentIntent();
-  }, [amount, onPaymentError]);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsLoading(true);
 
-  const StripeForm = () => {
-    const stripe = useStripe();
-    const elements = useElements();
+    if (!stripe || !elements) {
+      return;
+    }
 
-    const handleSubmit = async (event) => {
-      event.preventDefault();
-      setIsLoading(true);
+    const { error: submitError } = await elements.submit();
 
-      if (!stripe || !elements || !clientSecret) {
-        setError('Payment initialization failed. Please try again later.');
-        setIsLoading(false);
-        onPaymentError(new Error('Payment initialization failed'));
-        return;
-      }
+    if (submitError) {
+      setErrorMessage(submitError.message);
+      setIsLoading(false);
+      return;
+    }
 
-      const cardElement = elements.getElement(CardElement);
+    const { error } = await stripe.confirmPayment({
+      elements,
+      clientSecret,
+      confirmParams: {
+        return_url: `http://localhost:3000/payment-success?amount=${amount}`
+      },
+    });
 
-      try {
-        const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
-          payment_method: {
-            card: cardElement,
-          },
-        });
+    if (error) {
+      setErrorMessage(error.message);
+    } else {
 
-        if (error) {
-          setError(error.message);
-          onPaymentError(error);
-        } else if (paymentIntent.status === 'succeeded') {
-          onPaymentSuccess(paymentIntent);
-        }
-      } catch (err) {
-        setError(err.message);
-        onPaymentError(err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    }
 
-    const handleCancel = () => {
-      onPaymentCancel();
-    };
-
-    return (
-      <div className="w-full">
-        {error && (
-          <div className="bg-red-100 text-red-800 p-2 rounded-lg mb-4">
-            {error}
-          </div>
-        )}
-        {!clientSecret && !error && (
-          <div className="flex justify-center p-4">
-            <div className="spinner border-4 border-t-4 border-gray-200 rounded-full w-10 h-10 animate-spin"></div>
-          </div>
-        )}
-        {clientSecret && (
-          <>
-            <div className="mb-4">
-              <CardElement
-                options={{
-                  style: {
-                    base: {
-                      fontSize: '16px',
-                      color: '#424770',
-                      '::placeholder': {
-                        color: '#aab7c4',
-                      },
-                    },
-                    invalid: {
-                      color: '#9e2146',
-                    },
-                  },
-                }}
-              />
-            </div>
-            <div className="flex justify-between">
-              <Button onClick={handleCancel} color="secondary" disabled={isLoading}>
-                Cancel
-              </Button>
-              <Button onClick={handleSubmit} color="primary" disabled={isLoading || !stripe || !clientSecret}>
-                {isLoading ? 'Processing...' : `Pay $${amount}`}
-              </Button>
-            </div>
-          </>
-        )}
-      </div>
-    );
+    setIsLoading(false);
   };
 
-  return (
-    <Elements stripe={stripePromise}>
-      <StripeForm />
-    </Elements>
-  );
-};
+  if (!clientSecret || !stripe || !elements) {
+    return <div className='w-full text-center my-4' role="status">
+              <svg aria-hidden="true" className="inline w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-[#E74683]" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                  <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+              </svg>
+              <span className="sr-only">Loading...</span>
+          </div>
+        }
 
-export default StripeCheckout;
+  return(
+    <form onSubmit={handleSubmit} className='w-full text-center my-4 bg-black p-2 rounded-md'>
+      <p>d</p>
+      {clientSecret && <PaymentElement /> }
+      {errorMessage && <div>{errorMessage}</div> }
+      <p>d</p>
+      <Button type='submit' isDisabled={!stripe || isLoading} color='primary' className='w-full'>
+        {!isLoading ? `Pay $${amount}`: "Processing..."}
+      </Button>
+    </form>
+  )
+}
+
+export default CheckoutPage;
