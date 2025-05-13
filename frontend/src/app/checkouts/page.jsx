@@ -22,6 +22,7 @@ import {
 import CheckoutPage from '@/components/payment/StripeCheckout';
 import { loadStripe } from '@stripe/stripe-js';
 import convertToSubcurrency from '@/lib/convetToSubcurrency';
+import Loader from '@/components/Loader';
 
 
 const stripePromise = loadStripe('pk_test_51OpZiJFHs1GmgtcbJ0jbzfsHMriJb4XHRammGCq7fuZplZ9TFshdUeJCf6RBXjj6QymUIvI3ysgk1v9CtN5gqRch00oCzByb2Y')
@@ -41,7 +42,7 @@ const Checkout = () => {
     state: '',
     zipCode: '',
   });
-
+  const [orderTotal, setOrderTotal] = useState(0);
   const { cartProduct, setCartProduct } = useCart();
   
 
@@ -127,8 +128,21 @@ const Checkout = () => {
       price: 948.00,
       image: 'https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927'
     }
-  ];
-
+  ]; 
+  
+  const [loader, setLoader] = useState(true);
+  useEffect(() => {
+    if (Array.isArray(cartProduct)) {
+      const total = cartProduct.reduce((acc, item) => {
+        const price = item?.currentPrice ?? item?.productId?.currentPrice ?? 0;
+        const quantity = item?.quantity ?? 1;
+        return acc + (Number(price) * Number(quantity));
+      }, 0);
+      setOrderTotal(total);
+      setLoader(false);
+    }
+  }, [cartProduct]);
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -137,26 +151,31 @@ const Checkout = () => {
     }));
   };
 
+  const isFormValid = () => {
+    return Object.values(formData).every(value => value !== ''); // Checks if no value is empty
+  };
 
-  const amount = 49.00
+  const [isFormFilled, setIsFormFilled] = useState(true);
+  
+  useEffect(() => {
+    setIsFormFilled(isFormValid());
+  }, [formData]);
+
+  const amount = orderTotal;
   return (
     <div className="mx-auto p-6">
-          <Elements stripe={stripePromise} options={{ 
-            mode: "payment",
-            amount: convertToSubcurrency(amount),
-            currency: "usd"
-           }}>
-            <CheckoutPage amount={amount} />
-          </Elements>
+      {loader && <Loader />}
           <div className='-mt-8 mb-8'>
             <Stepper steps={[{title: 'Shopping Cart'}, {title: 'Checkout'}, {title: 'Confirmation'}]} activeStep={1} defaultColor="#E0E0E0" completeColor="#E74683" activeColor="#E74683" />
           </div>
           <div className="grid md:grid-cols-2 gap-8">
             <div>
               <Card>
-                <CardBody>
+              <CardBody>
                   <div className="space-y-4">
                     <Input 
+                      radius='sm'
+                      variant='bordered'
                       type="email" 
                       label="Email Address" 
                       name="email"
@@ -166,6 +185,8 @@ const Checkout = () => {
                     />
 
                     <Input 
+                      radius='sm'
+                      variant='bordered'
                       type="tel" 
                       label="Phone Number" 
                       name="phone"
@@ -175,6 +196,8 @@ const Checkout = () => {
 
                     <div className="grid md:grid-cols-2 gap-4">
                       <Input 
+                        radius='sm'
+                        variant='bordered'
                         type="text" 
                         label="First Name" 
                         name="firstName"
@@ -183,6 +206,8 @@ const Checkout = () => {
                         required
                       />
                       <Input 
+                        radius='sm'
+                        variant='bordered'
                         type="text" 
                         label="Last Name" 
                         name="lastName"
@@ -193,6 +218,8 @@ const Checkout = () => {
                     </div>
 
                     <Select
+                      radius='sm'
+                      variant='bordered'
                       label="Delivery Country"
                       selectedKeys={selectedCountry ? [selectedCountry] : []}
                       onSelectionChange={(keys) => {
@@ -212,6 +239,8 @@ const Checkout = () => {
                     </Select>
 
                     <Input 
+                      radius='sm'
+                      variant='bordered'
                       type="text" 
                       label="Street Address" 
                       name="address"
@@ -221,6 +250,8 @@ const Checkout = () => {
                     />
 
                     <Input 
+                      radius='sm'
+                      variant='bordered'
                       type="text" 
                       label="Apartment, suite, etc. (optional)" 
                       name="apartment"
@@ -230,6 +261,8 @@ const Checkout = () => {
 
                     <div className="grid md:grid-cols-3 gap-4">
                       <Input 
+                        radius='sm'
+                        variant='bordered'
                         type="text" 
                         label="City" 
                         name="city"
@@ -238,6 +271,8 @@ const Checkout = () => {
                         required
                       />
                       <Input 
+                        radius='sm'
+                        variant='bordered'
                         type="text" 
                         label="State" 
                         name="state"
@@ -246,6 +281,8 @@ const Checkout = () => {
                         required
                       />
                       <Input 
+                        radius='sm'
+                        variant='bordered'
                         type="text" 
                         label="ZIP Code" 
                         name="zipCode"
@@ -256,6 +293,20 @@ const Checkout = () => {
                     </div>
                   </div>
                 </CardBody>
+                {
+                  orderTotal > 0 && (
+                    <Elements
+                      stripe={stripePromise}
+                      options={{ 
+                        mode: "payment",
+                        amount: convertToSubcurrency(amount), // Now it's safe
+                        currency: "usd"
+                      }}
+                    >
+                      <CheckoutPage amount={amount} isFormFilled={isFormFilled} />
+                    </Elements>
+                  )
+                }
               </Card>
             </div>
 

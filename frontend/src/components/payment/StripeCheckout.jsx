@@ -11,8 +11,9 @@ import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import convertToSubcurrency from '@/lib/convetToSubcurrency';
 import { Button } from '@nextui-org/react';
+import Loader from '../Loader';
 
-function CheckoutPage({ amount }) {
+function CheckoutPage({ amount, isFormFilled }) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -80,13 +81,12 @@ function CheckoutPage({ amount }) {
         }
 
   return(
-    <form onSubmit={handleSubmit} className='w-full text-center my-4 bg-black p-2 rounded-md'>
-      <p>d</p>
+    <form onSubmit={handleSubmit} className='w-full text-center mt-4 p-4 rounded-md'>
       {clientSecret && <PaymentElement /> }
       {errorMessage && <div>{errorMessage}</div> }
-      <p>d</p>
-      <Button type='submit' isDisabled={!stripe || isLoading} color='primary' className='w-full'>
-        {!isLoading ? `Pay $${amount}`: "Processing..."}
+      
+      <Button type='submit' isDisabled={!stripe || isLoading || !isFormFilled} color='primary' className='w-full my-4'>
+        <p className='text-white'>{!isLoading ? `Pay $${amount}`: "Processing..."}</p>
       </Button>
     </form>
   )

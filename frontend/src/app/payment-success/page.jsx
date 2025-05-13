@@ -4,6 +4,7 @@ import { Card, CardBody, Divider } from "@nextui-org/react";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import Stepper from 'react-stepper-horizontal';
 import { Goldman } from 'next/font/google';
+import { useSearchParams } from 'next/navigation';
 
 
 const GoldmanFont = Goldman({
@@ -12,6 +13,10 @@ const GoldmanFont = Goldman({
   });
   
 const OrderConfirmation = () => {
+  const searchParams = useSearchParams();
+  const amount = searchParams.get('amount');
+
+  console.log('order amount in success page: ', amount)
   const orderDetails = {
     orderNumber: "100000147",
     email: "sample@zoey.com",
