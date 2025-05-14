@@ -9,6 +9,7 @@ export function CartProvider({ children }) {
   const [cartProduct, setCartProduct] = useState([]);
   const [forceSync, setForceSync] = useState(false);
   const { isAuthenticated } = useAuth();
+  const [cartId, setCartId] = useState('');
 
   // Load cart from localStorage only on initial mount or when not authenticated
   useEffect(() => {
@@ -22,6 +23,7 @@ export function CartProvider({ children }) {
           const config = { headers: { Authorization: `Bearer ${token}` } };
           const response = await api.get('/cart', config);
           setCartProduct(response.data.products || []);
+          setCartId(response.data._id);
         } catch (err) {
           console.log('Failed to load cart from MongoDB:', err);
         }
@@ -67,7 +69,9 @@ export function CartProvider({ children }) {
       cartProduct, 
       setCartProduct, 
       forceSync, 
-      triggerSync 
+      triggerSync ,
+      cartId,
+      setCartId
     }}>
       {children}
     </CartContext.Provider>

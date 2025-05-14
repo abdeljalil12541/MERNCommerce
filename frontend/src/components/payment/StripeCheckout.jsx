@@ -12,8 +12,9 @@ import api from '@/lib/api';
 import convertToSubcurrency from '@/lib/convetToSubcurrency';
 import { Button } from '@nextui-org/react';
 import Loader from '../Loader';
+import { useCart } from '@/context/CartContext';
 
-function CheckoutPage({ amount, isFormFilled }) {
+function CheckoutPage({ amount, isFormFilled, cartProduct, customerInfo }) {
   const stripe = useStripe();
   const elements = useElements();
 
@@ -21,6 +22,14 @@ function CheckoutPage({ amount, isFormFilled }) {
   const [errorMessage, setErrorMessage] = useState(null);
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState('Stripe');
+  const [userId, setUserId] = useState(null);
+  const {cartId, setCartId} = useCart();
+
+  console.log('cart product from checkout pagesss: ', cartProduct);
+  console.log('cart id: ', cartId)
+  console.log('user id: ', userId)
+  console.log('customerInfo: ', customerInfo)
 
   useEffect(() => {
     const fetchClientSecret = async () => {
@@ -37,37 +46,122 @@ function CheckoutPage({ amount, isFormFilled }) {
     fetchClientSecret();
   }, [amount]);
 
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          throw new Error('No token found, please log in');
+        }
+
+        console.log('Fetching user data with token:', token);
+        const response = await api.get('/users/me', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        console.log('Response data:', response.data);
+        setUserId(response.data.id)
+        
+      } catch (err) { // No type annotation
+        return
+      } finally {
+        // setIsLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
+  const syncGuestCart = async () => {
+    try {
+      const guestCart = JSON.parse(localStorage.getItem('cart')) || [];
+      
+      // Properly map cart items based on their structure
+      const mappedItems = guestCart.map(item => ({
+        productId: item._id, // Use _id directly from localStorage cart
+        quantity: item.quantity,
+        selectedSize: item.selectedSize,
+      }));
+  
+      const response = await api.post('/orders/sync-guest-cart', {
+        products: mappedItems,
+      });
+  
+      console.log('Guest cart synced:', response.data);
+      setCartId(response.data.cartId);
+      return response.data.cartId;
+    } catch (err) {
+      console.log('Error syncing guest cart:', err);
+      throw err;
+    }
+  };
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
+  
+    try {
+      if (!stripe || !elements) {
+        return;
+      }
+  
+      const { error: submitError } = await elements.submit();
+  
+      if (submitError) {
+        setErrorMessage(submitError.message);
+        setIsLoading(false);
+        return;
+      }
+  
+      // Sync guest cart if not authenticated
+      let finalCartId = cartId;
+      if (!userId) {
+        finalCartId = await syncGuestCart();
+      }
+  
+      try {
+        // The key fix is here - we need to pass the cartProducts as an array with the cart ID
+        const response = await api.post('/orders/create-order', {
+          userId: userId || null,
+          cartProducts: [finalCartId], // Cart ID must be in an array as per Order schema
+          customerInfo: customerInfo,
+          paymentMethod: paymentMethod,
+          totalPrice: amount
+        });
+        
+        console.log('order created successfully:', response.data);
 
-    if (!stripe || !elements) {
-      return;
-    }
-
-    const { error: submitError } = await elements.submit();
-
-    if (submitError) {
-      setErrorMessage(submitError.message);
+        // Clear cart from localStorage for guest users
+        if (!userId) {
+          localStorage.removeItem('cart');
+        }
+        
+        // Proceed with payment confirmation
+        const { error } = await stripe.confirmPayment({
+          elements,
+          clientSecret,
+          confirmParams: {
+            return_url: `${window.location.origin}/payment-success?amount=${amount}&orderId=${response.data.orderId}`
+          },
+        });
+        
+        if (error) {
+          setErrorMessage(error.message);
+        }
+      } catch (err) {
+        console.log('Error creating order:', err);
+        setErrorMessage(err.response?.data?.message || 'Failed to create order');
+      }
+    } catch (err) {
+      console.log('error: ', err.message);
+      setErrorMessage('Payment processing failed');
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    const { error } = await stripe.confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: `http://localhost:3000/payment-success?amount=${amount}`
-      },
-    });
-
-    if (error) {
-      setErrorMessage(error.message);
-    } else {
-
-    }
-
-    setIsLoading(false);
   };
 
   if (!clientSecret || !stripe || !elements) {
@@ -82,6 +176,7 @@ function CheckoutPage({ amount, isFormFilled }) {
 
   return(
     <form onSubmit={handleSubmit} className='w-full text-center mt-4 p-4 rounded-md'>
+      {/* {isLoading && <Loader /> } */}
       {clientSecret && <PaymentElement /> }
       {errorMessage && <div>{errorMessage}</div> }
       
@@ -91,5 +186,4 @@ function CheckoutPage({ amount, isFormFilled }) {
     </form>
   )
 }
-
 export default CheckoutPage;

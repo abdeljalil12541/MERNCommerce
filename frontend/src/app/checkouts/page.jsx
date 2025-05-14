@@ -24,7 +24,6 @@ import { loadStripe } from '@stripe/stripe-js';
 import convertToSubcurrency from '@/lib/convetToSubcurrency';
 import Loader from '@/components/Loader';
 
-
 const stripePromise = loadStripe('pk_test_51OpZiJFHs1GmgtcbJ0jbzfsHMriJb4XHRammGCq7fuZplZ9TFshdUeJCf6RBXjj6QymUIvI3ysgk1v9CtN5gqRch00oCzByb2Y')
 
 const Checkout = () => {
@@ -44,7 +43,6 @@ const Checkout = () => {
   });
   const [orderTotal, setOrderTotal] = useState(0);
   const { cartProduct, setCartProduct } = useCart();
-  
 
   useEffect(() => {
     const getCountries = async () => {
@@ -303,7 +301,7 @@ const Checkout = () => {
                         currency: "usd"
                       }}
                     >
-                      <CheckoutPage amount={amount} isFormFilled={isFormFilled} />
+                      <CheckoutPage amount={amount} isFormFilled={isFormFilled} cartProduct={cartProduct} customerInfo={formData} />
                     </Elements>
                   )
                 }

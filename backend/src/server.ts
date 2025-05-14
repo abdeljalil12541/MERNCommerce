@@ -7,6 +7,7 @@ import cartRoutes from './routes/cartRouter.js';
 import categoriesRouter from './routes/categoriesRouter.js';
 import productRouter from './routes/productsRouter.js';
 import paymentRouter from './routes/paymentRouter.js';
+import orderRouter from './routes/orderRouter.js';
 import User from './models/User.js';
 import { verifyToken, JwtPayload } from './utils/jwt.js';
 import Address from './models/Address.js';
@@ -109,6 +110,7 @@ app.use('/api', categoriesRouter);
 app.use('/api', productRouter);
 app.use('/api/cart', cartRoutes);
 app.use('/api', paymentRouter);
+app.use('/api/orders', orderRouter);
 console.log('User routes mounted at /api/users');
 
 app.get('/', (req: Request, res: Response) => {

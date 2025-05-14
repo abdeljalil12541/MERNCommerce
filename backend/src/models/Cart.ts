@@ -38,7 +38,7 @@ const cartSchema = new Schema<ICart>({
   userId: {
     type: Schema.Types.ObjectId,
     ref: 'User', // References User model
-    required: true,
+    required: false,
   },
   products: [cartItemSchema],
   updatedAt: {
