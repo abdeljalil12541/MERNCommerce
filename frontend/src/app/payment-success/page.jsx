@@ -1,22 +1,20 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardBody, Divider } from "@nextui-org/react";
 import { IoCheckmarkCircleSharp } from "react-icons/io5";
 import Stepper from 'react-stepper-horizontal';
 import { Goldman } from 'next/font/google';
 import { useSearchParams } from 'next/navigation';
 
-
 const GoldmanFont = Goldman({
-    subsets: ['latin'],
-    weight: ['400'],
-  });
-  
+  subsets: ['latin'],
+  weight: ['400'],
+});
+
 const OrderConfirmation = () => {
   const searchParams = useSearchParams();
   const amount = searchParams.get('amount');
 
-  console.log('order amount in success page: ', amount)
   const orderDetails = {
     orderNumber: "100000147",
     email: "sample@zoey.com",
@@ -33,7 +31,8 @@ const OrderConfirmation = () => {
     paymentMethod: "Check / Money Order"
   };
 
-  
+  const orderData = JSON.parse(sessionStorage.getItem('latestOrder'));
+  console.log('order amount in success page: ', amount)
 
   const products = [
     { title: 'BEAST SKATE DECK - PINK', size: 'S', color: 'Red', productType: 'Accessoiries', regularPrice: 499, currentPrice: 459, discount: 16, status: 'NEW', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-03-15', ifBestSeller: true },
@@ -42,68 +41,73 @@ const OrderConfirmation = () => {
     { title: 'BEAST SKATE DECK - GREEN', size: 'S', color: 'Black', productType: 'Backpack', regularPrice: 499, currentPrice: 399, discount: 20, status: 'TRENDING', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-03-01', ifBestSeller: true },
   ];
 
+  const subtotal = orderData.cartProduct.reduce((acc, item) => {
+    const price = item.currentPrice || (item.productId && item.productId.currentPrice) || 0;
+    return acc + price * item.quantity;
+  }, 0);
+
+  const shippingAndHandling = 20;
+  const tax = 0;
+  const totalPrice = orderData.totalPrice + shippingAndHandling + tax;
+
+
+
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className='-mt-8 mb-8'>
-        <Stepper steps={ [{title: 'Shopping Cart'}, {title: 'Checkout'}, {title: 'Confirmation'}] } activeStep={ 2 } defaultColor="#E0E0E0" completeColor="#E74683" activeColor="#E74683" />
+        <Stepper steps={[{ title: 'Shopping Cart' }, { title: 'Checkout' }, { title: 'Confirmation' }]} activeStep={2} defaultColor="#E0E0E0" completeColor="#E74683" activeColor="#E74683" />
       </div>
       <div className="max-w-6xl mx-auto px-4">
-        
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Order Details Section */}
           <div className="md:col-span-2">
             <Card>
               <CardBody className="p-6">
-                {/* Order Success Message */}
                 <div className="text-2xl font-medium text-center justify-center flex text-green-600 mb-10 mt-1">
-                    <IoCheckmarkCircleSharp className='mt-[2px] mr-1 size-7' /> Thank you! Your order has been placed.
+                  <IoCheckmarkCircleSharp className='mt-[2px] mr-1 size-7' /> Thank you! Your order has been placed.
                 </div>
-                
+
                 <div className="space-y-6">
-                  {/* Order Number */}
                   <div>
-                    <h2 className="text-lg font-medium">Your order # is: {orderDetails.orderNumber}</h2>
+                    <h2 className="text-lg font-medium">Your order # is: {orderData.orderId.toUpperCase().slice(0, 9)}</h2>
                     <p className="text-sm text-gray-500">
-                      An email receipt including the details about your order has been sent to {orderDetails.email}
+                      An email receipt including the details about your order has been sent to {orderData.customerInfo.email}
                     </p>
                   </div>
 
                   <Divider />
 
-                  {/* Shipping Address */}
                   <div>
                     <h3 className="font-medium mb-2">This order will be shipped to:</h3>
                     <div className="text-sm text-gray-600">
-                      <p>{orderDetails.shippingAddress.name}</p>
-                      <p>{orderDetails.shippingAddress.address}</p>
+                      <p>{orderData.customerInfo.firstName} {orderData.customerInfo.lastName}</p>
+                      <p>{orderData.customerInfo.address}</p>
+                      <p>{orderData.customerInfo.apartment}</p>
                       <p>
-                        {orderDetails.shippingAddress.city}, {orderDetails.shippingAddress.state} {orderDetails.shippingAddress.zip}
+                        {orderData.customerInfo.city}, {orderData.customerInfo.state} {orderData.customerInfo.zipCode}
                       </p>
-                      <p>{orderDetails.shippingAddress.country}</p>
-                      <p>T: {orderDetails.shippingAddress.phone}</p>
+                      <p>{orderData.customerInfo.country}</p>
+                      <p>T: {orderData.customerInfo.phone}</p>
                     </div>
                   </div>
 
                   <Divider />
 
-                  {/* Shipping Method */}
                   <div>
                     <h3 className="font-medium mb-2">Shipping Method</h3>
-                    <p className="text-sm text-gray-600">{orderDetails.shippingMethod}</p>
+                    <p className="text-sm text-gray-600">FedEx</p>
                   </div>
 
                   <Divider />
 
-                  {/* Payment Method */}
                   <div>
                     <h3 className="font-medium mb-2">Payment Method</h3>
-                    <p className="text-sm text-gray-600">{orderDetails.paymentMethod}</p>
+                    <p className="text-sm text-gray-600">{orderData.paymentMethod}</p>
                   </div>
 
                   <Divider />
 
-                  {/* Questions Section */}
                   <div className="bg-gray-50 p-4 rounded-lg">
                     <h3 className="font-medium mb-2">Questions?</h3>
                     <p className="text-sm text-gray-600">
@@ -125,39 +129,43 @@ const OrderConfirmation = () => {
               <CardBody className="p-6">
                 <h2 className="text-lg font-medium mb-4">Order Summary</h2>
                 <div className="space-y-4">
-                  {/* Product */}
-                  <div className="flex items-center space-x-4">
-                    <div className="h-12 w-12 overflow-hidden bg-gray-200 rounded-md">
-                        <img src="https://cdn.shopify.com/s/files/1/0016/1975/5059/files/MB0078-BLK_0012_449Q4MrBeast.StoreKids2024copy_9aa35d68-a871-44f6-862d-4e7f83cfb83e.jpg?v=1733171927" alt="" />
+                  {orderData.cartProduct.map((item, index) => (
+                    <div key={index} className="flex items-center space-x-4">
+                      <div className="h-12 w-12 overflow-hidden bg-gray-200 rounded-md">
+                        <img
+                          src={item?.mainSrc || (item?.productId && item.productId.mainSrc)}
+                          alt={item?.title || (item?.productId && item.productId.title)}
+                          className='w-full h-full object-cover'
+                        />
+                      </div>
+                      <div>
+                        <p className="font-medium">{item?.title || (item?.productId && item.productId.title)}</p>
+                        <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">TST</p>
-                      <p className="text-sm text-gray-500">Qty: 1</p>
-                    </div>
-                  </div>
+                  ))}
 
                   <Divider />
 
-                  {/* Totals */}
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Subtotal</span>
-                      <span>$24.00</span>
+                      <span>${subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Shipping & Handling (Flat Rate)</span>
-                      <span className='ml-1'>$5.00</span>
+                      <span className='ml-1'>${shippingAndHandling.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Tax</span>
-                      <span>$0.00</span>
+                      <span>${tax.toFixed(2)}</span>
                     </div>
-                    
+
                     <Divider />
-                    
+
                     <div className="flex justify-between font-medium text-lg">
                       <span>Grand Total</span>
-                      <span>$29.00</span>
+                      <span>${totalPrice.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>

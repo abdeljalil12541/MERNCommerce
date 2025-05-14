@@ -346,7 +346,11 @@ const handleDelete = async (productId, selectedSize) => {
 
       <div className="w-full absolute bottom-3 flex justify-center text-gray-600">
         <Button className="uppercase px-10 py-2 rounded-full mt-36 text-gray-500 text-[17px] border-gray-400" variant="bordered">
-          {cartProduct.length > 0 ? 'Go to cart' : 'Continue Shopping'}
+          {cartProduct.length > 0 ? 
+            <Link className="text-gray-700" href="/checkouts">Go to cart</Link>
+            : 
+            <Link className="text-gray-700" href="/">Continue Shopping</Link>
+          }
         </Button>
       </div>
     </div>

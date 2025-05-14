@@ -22,7 +22,7 @@ function CheckoutPage({ amount, isFormFilled, cartProduct, customerInfo }) {
   const [errorMessage, setErrorMessage] = useState(null);
   const [clientSecret, setClientSecret] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [paymentMethod, setPaymentMethod] = useState('Stripe');
+  const [paymentMethod, setPaymentMethod] = useState('Stripe Payment');
   const [userId, setUserId] = useState(null);
   const {cartId, setCartId} = useCart();
 
@@ -132,8 +132,16 @@ function CheckoutPage({ amount, isFormFilled, cartProduct, customerInfo }) {
           paymentMethod: paymentMethod,
           totalPrice: amount
         });
+
+        sessionStorage.setItem('latestOrder', JSON.stringify({
+          orderId: response.data.orderId,
+          cartProduct,
+          customerInfo,
+          paymentMethod,
+          totalPrice: amount
+        }));
         
-        console.log('order created successfully:', response.data);
+        console.log('order created successfully:', response.data.orderData);
 
         // Clear cart from localStorage for guest users
         if (!userId) {
@@ -145,7 +153,7 @@ function CheckoutPage({ amount, isFormFilled, cartProduct, customerInfo }) {
           elements,
           clientSecret,
           confirmParams: {
-            return_url: `${window.location.origin}/payment-success?amount=${amount}&orderId=${response.data.orderId}`
+            return_url: `http://localhost:3000/payment-success?amount=${amount}&orderId=${response.data.orderId}`
           },
         });
         
