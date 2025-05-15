@@ -40,13 +40,11 @@ export default function SideBar() {
 
   const menuItems = [
     { icon: <User size={18} />, text: "Votre compte Jumia", href: "/account/index" },
-    { icon: <Package size={18} />, text: "Vos commandes", href: "/orders" },
-    { icon: <Mail size={18} />, text: "Boîte de réception", href: "/inbox" },
-    { icon: <MessageSquare size={18} />, text: "Vos avis en attente", href: "/pending-reviews" },
-    { icon: <Ticket size={18} />, text: "Bons d'achat", href: "/vouchers" },
-    { icon: <Heart size={18} />, text: "Favoris", href: "/favorites" },
-    { icon: <Store size={18} />, text: "Vendeurs suivis", href: "/followed-sellers" },
-    { icon: <Clock size={18} />, text: "Vus récemment", href: "/recently-viewed" },
+    { icon: <Package size={18} />, text: "Vos commandes", href: "/account/orders" },
+    { icon: <Mail size={18} />, text: "Boîte de réception", href: "/account/inbox" },
+    { icon: <MessageSquare size={18} />, text: "Vos avis en attente", href: "/account/reviews" },
+    { icon: <Heart size={18} />, text: "Favoris", href: "/account/wishlist" },
+    { icon: <Clock size={18} />, text: "Vus récemment", href: "/account/recently-viewed-products" },
   ];
 
   const accountSettings = [

@@ -1,11 +1,15 @@
 "use client";
 import SideBar from "../../../components/SideBar"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, Button, Divider } from '@nextui-org/react';
 import { Package } from 'lucide-react';
+import api from "@/lib/api";
 
 export default function AccountOrders() {
     const [activeTab, setActiveTab] = useState('canceled');
+    const [userId, setUserId] = useState(null);
+    const [orders, setOrders] = useState([]);
+
 
     const upcomingOrdersProducts = [
         {
@@ -69,6 +73,54 @@ export default function AccountOrders() {
     }
     ];
 
+    useEffect(() => {
+      const fetchUserData = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          if (!token) {
+            throw new Error('No token found, please log in');
+          }
+  
+          console.log('Fetching user data with token:', token);
+          const response = await api.get('/users/me', {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+  
+          console.log('Response data:', response.data);
+          setUserId(response.data.id)
+          
+        } catch (err) { // No type annotation
+          return
+        } finally {
+          // setIsLoading(false);
+        }
+      };
+  
+      fetchUserData();
+    }, []);
+
+    useEffect(() => {
+      const fetchOrders = async () => {
+        if (userId) { // Only fetch if userId is available
+          try {
+            // FIXED: Pass userId in request body for POST request
+            const response = await api.post('/orders/get-orders', { userId });
+            console.log('orders: ', response.data.orders);
+            setOrders(response.data.orders);
+            const fetchedOrders = response.data.orders.flat();
+          setOrders(fetchedOrders);
+          } catch (error) {
+            console.error("Error fetching orders:", error);
+          }
+        }
+      };
+      
+      fetchOrders();
+    }, [userId]); // Add userId as dependency so it runs when userId changes
+
       const EmptyCard = () => (
         <Card className="w-full">
           <div className="flex flex-col items-center justify-center py-16">
@@ -87,76 +139,197 @@ export default function AccountOrders() {
           </div>
         </Card>
       );
+
+      function joinTitlesWithOverallLimit(titles, limit = 55) {
+        const fullString = titles.join(' | ');
+        if (fullString.length <= limit) {
+          return fullString;
+        } else {
+          return fullString.slice(0, limit).trimEnd() + '...'; // add "..." if truncated
+        }
+      }
+
+
+
     
       const CanceledOrders = () => (
         <div className="space-y-4">
-          {canceledOrdersProducts.length > 0 ? 
-          (canceledOrdersProducts.map((order) => (
-            <Card key={order.id} className="w-full">
-              <div className="p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <img 
-                    src={order.image} 
-                    alt={order.name}
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
-                  <div>
-                    <h3 className="font-medium text-sm">{order.name}</h3>
-                    <p className="text-sm text-gray-500">Commande {order.id}</p>
-                    <Button 
-                      size="sm" 
-                      variant="flat" 
-                      color={order.status === 'ANNULÉE' ? 'danger' : 'warning'}
-                      className="mt-1 px-2 py-1 h-auto min-h-0"
-                    >
-                      {order.status}
-                    </Button>
-                    <p className="text-sm text-gray-500 mt-1">{order.date}</p>
+          {orders.filter(order => 
+            order.status.toLowerCase() === "canceled" || 
+            order.status.toLowerCase() === "returned"
+          ).length > 0 ? (
+            orders.filter(order => 
+              order.status.toLowerCase() === "canceled" || 
+              order.status.toLowerCase() === "returned"
+            ).map((order, index) => {
+              const productImages = order.cartProducts.slice(0, 4).map(item => item.productId.mainSrc);
+              const imageCount = productImages.length;
+              
+              return (
+                <Card key={index} className="w-full">
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 overflow-hidden rounded-md">
+                        {imageCount === 1 && (
+                          <img
+                            src={productImages[0]}
+                            alt="Product"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                        
+                        {imageCount === 2 && (
+                          <div className="grid grid-cols-2 w-full h-full">
+                            {productImages.map((src, index) => (
+                              <img
+                                key={index}
+                                src={src}
+                                alt={`Product ${index}`}
+                                className="w-full h-full object-cover"
+                              />
+                            ))}
+                          </div>
+                        )}
+                        
+                        {(imageCount === 3 || imageCount === 4) && (
+                          <div className="grid grid-cols-2 grid-rows-2 w-full h-full gap-0.5">
+                            {productImages.map((src, index) => (
+                              <img
+                                key={index}
+                                src={src}
+                                alt={`Product ${index}`}
+                                className="w-full h-full object-cover"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-medium text-sm">
+                          {joinTitlesWithOverallLimit(order.cartProducts.map(item => item.productId.title))}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Commande {order._id.slice(0, 9).toUpperCase()}
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="flat"
+                          color={order.status.toLowerCase() === "returned" ? "warning" : "danger"}
+                          className="mt-1 px-2 py-1 h-auto min-h-0"
+                        >
+                          {order.status.toUpperCase()}
+                        </Button>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Le {new Date(order.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="text-sm">
+                      <a href="#" className="text-blue-500 hover:underline">
+                        Détails
+                      </a>
+                    </div>
                   </div>
-                </div>
-                <div className="text-sm">
-                    <a href="#" className="text-blue-500 hover:underline">Détails</a>
-                </div>
-              </div>
-            </Card>
-          ))) : ( <EmptyCard /> )}
+                </Card>
+              );
+            })
+          ) : (
+            <EmptyCard />
+          )}
         </div>
       );
 
       const UpcomingOrders = () => (
         <div className="space-y-4">
-          {upcomingOrdersProducts.length > 0 ? 
-          (upcomingOrdersProducts.map((order) => (
-            <Card key={order.id} className="w-full">
-              <div className="p-4 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <img 
-                    src={order.image} 
-                    alt={order.name}
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
-                  <div>
-                    <h3 className="font-medium text-sm">{order.name}</h3>
-                    <p className="text-sm text-gray-500">Commande {order.id}</p>
-                    <Button 
-                      size="sm" 
-                      variant="flat" 
-                      color={order.status === 'ANNULÉE' ? 'danger' : 'warning'}
-                      className="mt-1 px-2 py-1 h-auto min-h-0"
-                    >
-                      {order.status}
-                    </Button>
-                    <p className="text-sm text-gray-500 mt-1">{order.date}</p>
+          {orders.filter(order => 
+            order.status.toLowerCase() === "upcoming" || 
+            order.status.toLowerCase() === "delivered"
+          ).length > 0 ? (
+            orders.filter(order => 
+              order.status.toLowerCase() === "upcoming" || 
+              order.status.toLowerCase() === "delivered"
+            ).map((order, index) => {
+              const productImages = order.cartProducts.slice(0, 4).map(item => item.productId.mainSrc);
+              const imageCount = productImages.length;
+              
+              return (
+                <Card key={index} className="w-full">
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                      <div className="w-16 h-16 overflow-hidden rounded-md">
+                        {imageCount === 1 && (
+                          <img
+                            src={productImages[0]}
+                            alt="Product"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                        
+                        {imageCount === 2 && (
+                          <div className="grid grid-cols-2 w-full h-full">
+                            {productImages.map((src, index) => (
+                              <img
+                                key={index}
+                                src={src}
+                                alt={`Product ${index}`}
+                                className="w-full h-full object-cover"
+                              />
+                            ))}
+                          </div>
+                        )}
+                        
+                        {(imageCount === 3 || imageCount === 4) && (
+                          <div className="grid grid-cols-2 grid-rows-2 w-full h-full gap-0.5">
+                            {productImages.map((src, index) => (
+                              <img
+                                key={index}
+                                src={src}
+                                alt={`Product ${index}`}
+                                className="w-full h-full object-cover"
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-medium text-sm">
+                          {joinTitlesWithOverallLimit(order.cartProducts.map(item => item.productId.title))}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          Commande {order._id.slice(0, 9).toUpperCase()}
+                        </p>
+                        <Button
+                          size="sm"
+                          variant="flat"
+                          color={order.status.toLowerCase() === 'delivered' ? 'success' : 'warning'}
+                          className="mt-1 px-2 py-1 h-auto min-h-0"
+                        >
+                          {order.status.toUpperCase()}
+                        </Button>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Le {new Date(order.createdAt).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <div className="text-sm">
+                      <a href="#" className="text-blue-500 hover:underline">
+                        Détails
+                      </a>
+                    </div>
                   </div>
-                </div>
-                <div className="text-sm">
-                    <a href="#" className="text-blue-500 hover:underline">Détails</a>
-                </div>
-              </div>
-            </Card>
-          ))) : ( <EmptyCard /> )}
+                </Card>
+              );
+            })
+          ) : (
+            <EmptyCard />
+          )}
         </div>
       );
+      
     
     return(
         <div className="w-full grid grid-cols-4 gap-6 px-8 py-8">
@@ -178,7 +351,10 @@ export default function AccountOrders() {
                                     onClick={() => setActiveTab('current')}
                                     disableAnimation
                                 >
-                                    EN COURS/LIVRÉES (0)
+                                    EN COURS/LIVRÉES ({orders.filter(order => 
+                                      order.status.toLowerCase() === "upcoming" || 
+                                      order.status.toLowerCase() === "delivered"
+                                    ).length})
                                 </Button>
                                 <Button
                                     className={`flex-1 rounded-none ${activeTab === 'canceled' ? 'text-[#E74683] border-b-2 border-[#E74683]' : 'text-gray-500'}`}
@@ -186,7 +362,10 @@ export default function AccountOrders() {
                                     onClick={() => setActiveTab('canceled')}
                                     disableAnimation
                                 >
-                                    ANNULÉES/RETOURNÉES (4)
+                                    ANNULÉES/RETOURNÉES ({orders.filter(order => 
+                                      order.status.toLowerCase() === "canceled" || 
+                                      order.status.toLowerCase() === "returned"
+                                    ).length})
                                 </Button>
                                 </div>
                             </Card>
