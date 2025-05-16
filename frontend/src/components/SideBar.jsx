@@ -99,7 +99,7 @@ export default function SideBar() {
             <Link href={item.href}>
               <button
                 className={`w-full flex items-center py-2 px-3 my-1 hover:bg-gray-200 rounded-md text-left ${
-                  currentPath === item.href ? "bg-gray-200" : ""
+                  currentPath.startsWith(item.href) ? "bg-gray-200" : ""
                 }`}
               >
                 <span className="mr-3 text-gray-600">{item.icon}</span>

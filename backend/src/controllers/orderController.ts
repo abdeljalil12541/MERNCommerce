@@ -76,7 +76,12 @@ export const syncGuestCart: RequestHandler = async (req, res): Promise<void> => 
     const order = await Order.find({ userId })
       .populate({
         path: 'cartProducts.productId',  // populate productId inside each cartProduct
-        model: 'Product'
+        model: 'Product',
+        populate: {
+          path: 'category',
+          model: 'Category', // use your actual model name here
+          select: 'name' // only get the category name (optional)
+        }
       });
 
     res.status(201).json({ orders: order ? [order] : [] });

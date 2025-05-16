@@ -4,12 +4,15 @@ import React, { useEffect, useState } from 'react';
 import { Card, Button, Divider } from '@nextui-org/react';
 import { Package } from 'lucide-react';
 import api from "@/lib/api";
+import { useRouter } from "next/navigation";
+import Loader from '@/components/Loader';
 
 export default function AccountOrders() {
     const [activeTab, setActiveTab] = useState('canceled');
     const [userId, setUserId] = useState(null);
     const [orders, setOrders] = useState([]);
-
+    const router = useRouter();
+    const [loader, setLoader] = useState(true);
 
     const upcomingOrdersProducts = [
         {
@@ -114,6 +117,8 @@ export default function AccountOrders() {
           setOrders(fetchedOrders);
           } catch (error) {
             console.error("Error fetching orders:", error);
+          } finally {
+            setLoader(false);
           }
         }
       };
@@ -121,39 +126,52 @@ export default function AccountOrders() {
       fetchOrders();
     }, [userId]); // Add userId as dependency so it runs when userId changes
 
-      const EmptyCard = () => (
-        <Card className="w-full">
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="bg-gray-100 p-4 rounded-full mb-4">
-              <Package className="w-8 h-8 text-[#E74683]" />
-            </div>
-            <h3 className="text-lg font-medium mb-2">
-              Vous n'avez placé aucune commande !
-            </h3>
-            <p className="text-gray-600 text-center mb-6">
-              Toutes vos commandes seront sauvegardées ici pour que vous puissiez consulter leur statut à tout moment.
-            </p>
-            <Button color="warning" variant="solid">
-              Poursuivez vos achats
-            </Button>
+    const EmptyCard = () => (
+      <Card className="w-full">
+        <div className="flex flex-col items-center justify-center py-16">
+          <div className="bg-gray-100 p-4 rounded-full mb-4">
+            <Package className="w-8 h-8 text-[#E74683]" />
           </div>
-        </Card>
-      );
+          <h3 className="text-lg font-medium mb-2">
+            Vous n'avez placé aucune commande !
+          </h3>
+          <p className="text-gray-600 text-center mb-6">
+            Toutes vos commandes seront sauvegardées ici pour que vous puissiez consulter leur statut à tout moment.
+          </p>
+          <Button color="warning" variant="solid">
+            Poursuivez vos achats
+          </Button>
+        </div>
+      </Card>
+    );
 
-      function joinTitlesWithOverallLimit(titles, limit = 55) {
-        const fullString = titles.join(' | ');
-        if (fullString.length <= limit) {
-          return fullString;
-        } else {
-          return fullString.slice(0, limit).trimEnd() + '...'; // add "..." if truncated
-        }
+    function joinTitlesWithOverallLimit(titles, limit = 55) {
+      const fullString = titles.join(' | ');
+      if (fullString.length <= limit) {
+        return fullString;
+      } else {
+        return fullString.slice(0, limit).trimEnd() + '...'; // add "..." if truncated
       }
+    }
 
-
+    const PassOrderData = (order, e) => {
+      e.preventDefault();
+      try {
+        // Store the order data as a JSON string
+        sessionStorage.setItem('orderData', JSON.stringify(order));
+        console.log('Order data stored successfully');
+        // Navigate to the order detail page
+        router.push(`/account/orders/${order._id.toUpperCase()}`);
+      } catch (err) {
+        console.log('Error storing order data in session storage:', err.message);
+      }
+    };
+    
 
     
       const CanceledOrders = () => (
         <div className="space-y-4">
+          {loader && <Loader />}
           {orders.filter(order => 
             order.status.toLowerCase() === "canceled" || 
             order.status.toLowerCase() === "returned"
@@ -226,7 +244,11 @@ export default function AccountOrders() {
                       </div>
                     </div>
                     
-                    <div className="text-sm">
+                    <div 
+                      href={`/account/orders/${order._id}`} 
+                      className="text-blue-500 text-sm hover:underline"
+                      onClick={(e) => PassOrderData(order, e)}
+                    >
                       <a href="#" className="text-blue-500 hover:underline">
                         Détails
                       </a>
@@ -243,6 +265,7 @@ export default function AccountOrders() {
 
       const UpcomingOrders = () => (
         <div className="space-y-4">
+          {loader && <Loader />}
           {orders.filter(order => 
             order.status.toLowerCase() === "upcoming" || 
             order.status.toLowerCase() === "delivered"
@@ -315,7 +338,11 @@ export default function AccountOrders() {
                       </div>
                     </div>
                     
-                    <div className="text-sm">
+                    <div 
+                      href={`/account/orders/${order._id}`} 
+                      className="text-blue-500 text-sm hover:underline"
+                      onClick={(e) => PassOrderData(order, e)}
+                    >
                       <a href="#" className="text-blue-500 hover:underline">
                         Détails
                       </a>

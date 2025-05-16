@@ -5,7 +5,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import { FaStar } from "react-icons/fa";
 import ReactStars from 'react-stars';
-
 // Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -22,6 +21,7 @@ import {
     ModalFooter,
     useDisclosure,
 } from "@nextui-org/react";
+import { usePathname } from "next/navigation";
 
 const cars = [
     { id: 1, name: 'Car 1' },
@@ -33,6 +33,7 @@ const cars = [
 export default function ReviewSwipper() {
     const {isOpen, onOpen, onOpenChange} = useDisclosure();
     const [stars, setStars] = useState(0);
+    const pathname = usePathname();
 
     const [review, setReview] = useState('');
     const [name, setName] = useState('');
@@ -81,12 +82,12 @@ export default function ReviewSwipper() {
                 ))}
             </Swiper>
 
-            <div className="w-full mt-10 flex justify-center">
+            <div className={`w-full mt-10 flex justify-center ${pathname === '/' ? 'hidden' : ''}`}>
                 <Button
                     onClick={onOpen}
                     variant="ghost"
                     className="rounded border-default data-[hover=true]:!bg-gray-100"
-                    >
+                >
                     Add Review <MessageCirclePlus strokeWidth={1.5} />
                 </Button>
             </div>

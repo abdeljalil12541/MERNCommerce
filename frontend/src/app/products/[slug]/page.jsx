@@ -16,6 +16,7 @@ import { motion, useSpring } from 'framer-motion';
 import Loader from '@/components/Loader';
 import { useDrawerState } from '../../../context/DrawerContext';
 import { useCart } from '../../../context/CartContext'; // Add useCart
+import { useParams } from 'next/navigation';
 import api from '@/lib/api';
 
 const GoldmanFont = Goldman({
@@ -36,16 +37,24 @@ export default function ProductPage() {
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState([]);
+  const { slug } = useParams();
   const x = useSpring(0, {
     from: 0,
     to: 200,
   });
-
+  
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const storedProduct = sessionStorage.getItem('currentProduct');
-        if (storedProduct) {
+        const response = await api.get(`/products/${slug}`); // <-- Axios call
+        if (response) {
+          const data = response.data;
+          setProduct(data);
+          setSelectedSize(data.sizes[0]);
+          sessionStorage.setItem('currentProduct', JSON.stringify(data));
+          console.log('product sizes (from API): ', data.sizes);
+        } else {
+          const storedProduct = sessionStorage.getItem('currentProduct');
           const parsedProduct = JSON.parse(storedProduct);
           setProduct(parsedProduct);
           setSelectedSize(parsedProduct.sizes[0]);
@@ -110,7 +119,7 @@ export default function ProductPage() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await api.get('/users/me');
+        const response = await apiget.get('/users/me');
         setIsAuthenticated(true);
       } catch (err) {
         setIsAuthenticated(false);
@@ -145,8 +154,8 @@ export default function ProductPage() {
       };
 
       if (isAuthenticated) {
-        // For authenticated users, add to MongoDB via API
-        const response = await api.post('/cart/add', {
+        // For authenticated users, add to MongoDB via APIget
+        const response = await apiget.post('/cart/add', {
           productId: product._id,
           quantity: 1,
           selectedSize, // Pass selectedSize to the backend
@@ -186,7 +195,7 @@ export default function ProductPage() {
       <div className="w-full grid grid-cols-2">
         <div className="col-span-1 grid grid-cols-5">
           <div className="col-span-1 mr-2">
-            {product?.mainSrc && product?.variationImages ? (
+            {product?.mainSrc && product?.variationImages && (
               [...[product.mainSrc], ...product.variationImages].map((productImg, index) => (
                 <div key={index} onClick={() => handleActiveVarImg(index)}>
                   <img
@@ -198,8 +207,6 @@ export default function ProductPage() {
                   />
                 </div>
               ))
-            ) : (
-              <div>Loading images...</div> // Fallback UI
             )}
           </div>
           <div className="col-span-4 flex overflow-hidden justify-center">
@@ -213,7 +220,7 @@ export default function ProductPage() {
                 `}
               />
             ) : (
-              <div>Loading image...</div> // Fallback UI
+              <div className="w-full flex justify-center items-center">Loading image...</div> // Fallback UI
             )}
           </div>
         </div>
