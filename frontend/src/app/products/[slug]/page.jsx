@@ -340,7 +340,7 @@ export default function ProductPage() {
       </section>
 
       <section className='-mb-12'>
-        <ReviewSwipper />
+        <ReviewSwipper product={product} />
       </section>
 
       <Modal
