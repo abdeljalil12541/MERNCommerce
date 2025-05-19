@@ -62,7 +62,6 @@ export function CartProvider({ children }) {
     }
   }, [forceSync]);
 
-  console.log('cart products: ', cartProduct)
 
   return (
     <CartContext.Provider value={{ 

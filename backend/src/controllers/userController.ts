@@ -180,7 +180,6 @@ export const getCurrentUser: RequestHandler = async (req, res): Promise<void> =>
 
     // Fetch user's addresses
     const addresses = await Address.find({ user: decoded.id });
-    console.log("Fetched addresses for user", decoded.id, ":", addresses); // Debug log
 
     res.status(200).json({
       id: user._id,
