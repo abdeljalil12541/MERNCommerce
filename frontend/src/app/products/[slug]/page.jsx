@@ -17,7 +17,11 @@ import Loader from '@/components/Loader';
 import { useDrawerState } from '../../../context/DrawerContext';
 import { useCart } from '../../../context/CartContext'; // Add useCart
 import { useParams } from 'next/navigation';
+import { FaHeart, FaRegHeart } from "react-icons/fa";
+
 import api from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
+import Swal from 'sweetalert2';
 
 const GoldmanFont = Goldman({
   subsets: ['latin'],
@@ -36,11 +40,23 @@ export default function ProductPage() {
   const { cartProduct, setCartProduct } = useCart();
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const [loading, setLoading] = useState(true);
+  const { isAuthenticated } = useAuth();
   const [product, setProduct] = useState([]);
   const { slug } = useParams();
   const x = useSpring(0, {
     from: 0,
     to: 200,
+  });
+  const Toast = Swal.mixin({
+    toast: true,
+    position: "bottom-left",
+    showConfirmButton: false,
+    timer: 2000,
+    timerProgressBar: true,
+    didOpen: (toast) => {
+      toast.onmouseenter = Swal.stopTimer;
+      toast.onmouseleave = Swal.resumeTimer;
+    },
   });
   
   useEffect(() => {
@@ -99,12 +115,6 @@ export default function ProductPage() {
     { title: 'BEAST SKATE DECK - GREEN', size: 'S', color: 'Black', productType: 'Backpack', regularPrice: 499, currentPrice: 399, discount: 20, status: 'TRENDING', mainSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0006_SBpinkdeckpanther.jpg', hoverSrc: 'https://mrbeast.store/cdn/shop/files/MB0121-PNK_0002_SBpinkdecktop.jpg?v=1721252530&width=493', date: '2024-03-01', ifBestSeller: true },
   ];
 
-  const productImgs = [
-    { alt: 'product img 1', src:"https://mrbeast.store/cdn/shop/files/photo_2023-06-29_02-49-55.jpg?v=1718170165&width=1946" },
-    { alt: 'product img 3', src:"https://mrbeast.store/cdn/shop/files/0-6-Fcopy.jpg?v=1718170165&width=1946" },
-    { alt: 'product img 4', src:"https://mrbeast.store/cdn/shop/files/crop_0003_133.jpg?v=1718170165&width=1946" },
-  ]
-
   const [ activeVarImg, setActiveVarImg ] = useState(0);
   const [slideDirection, setSlideDirection] = useState('right');
 
@@ -113,21 +123,7 @@ export default function ProductPage() {
     setActiveVarImg(index);
   };
 
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [cart, setCart] = useState([]);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await apiget.get('/users/me');
-        setIsAuthenticated(true);
-      } catch (err) {
-        setIsAuthenticated(false);
-      }
-    };
-    
-    checkAuth();
-  }, []);
 
   // Load cart from localStorage on mount (for unauthenticated users)
   useEffect(() => {
@@ -188,6 +184,15 @@ export default function ProductPage() {
       console.log('Error adding product to cart:', err);
       alert('Failed to add product to cart. Please try again.');
     }
+  };
+
+  const [inWishlist, setInWishlist] = useState(false);
+  const toggleWishlist = () => {
+    setInWishlist(!inWishlist);
+    Toast.fire({
+      icon: "success",
+      title: inWishlist ? "Removed from wishlist!" : "Added to wishlist!",
+    });
   };
 
   return (
@@ -291,7 +296,25 @@ export default function ProductPage() {
 
               <p className={`mt-3 ${product?.stock <= 50 ? 'text-red-500' : 'hidden'}`}>Very Low Stock:  {product.stock}  UNITS LEFT </p>
 
-              <Button onPress={addProductToCart} color="primary" className="animate-shake rounded-lg my-4 w-full">ADD TO CART</Button>
+              <div className="flex items-center my-4 relative">
+                <Button 
+                  onPress={addProductToCart} 
+                  color="primary" 
+                  className={`animate-shake rounded-lg ${isAuthenticated ? 'w-[85%]' : 'w-full'}`}
+                >
+                  ADD TO CART
+                </Button>
+                {isAuthenticated && 
+                  <Button 
+                    onPress={toggleWishlist} 
+                    color='primary'
+                    className="absolute right-1 rounded-lg text-2xl"
+                    aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                  >
+                    {inWishlist ? <FaHeart className="text-white" /> : <FaRegHeart className="text-white" />}
+                  </Button>
+                }
+              </div>
             </div>
           </div>
         </div>
