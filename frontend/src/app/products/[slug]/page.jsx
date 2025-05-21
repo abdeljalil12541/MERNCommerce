@@ -36,7 +36,7 @@ const ArchivoFont = Archivo({
 export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState('');
   const { setDrawerOpen } = useDrawerState();
-  // const [cartProduct, setCartProduct] = useState([]);
+  const [userId, setUserId] = useState(null);
   const { cartProduct, setCartProduct } = useCart();
   const {isOpen, onOpen, onOpenChange} = useDisclosure();
   const [loading, setLoading] = useState(true);
@@ -187,12 +187,71 @@ export default function ProductPage() {
   };
 
   const [inWishlist, setInWishlist] = useState(false);
-  const toggleWishlist = () => {
-    setInWishlist(!inWishlist);
-    Toast.fire({
-      icon: "success",
-      title: inWishlist ? "Removed from wishlist!" : "Added to wishlist!",
-    });
+  
+
+  useEffect(() => {
+    if (!product || !product._id) return;
+  
+    const fetchInitialData = async () => {
+      try {
+        const userResponse = await api.get('/users/me');
+        const currentUserId = userResponse.data.id;
+        console.log("Current User ID:", currentUserId);
+        setUserId(currentUserId);
+  
+        const wishlistResponse = await api.get(`/wishlist/${currentUserId}`);
+        console.log("Wishlist Data:", wishlistResponse.data);
+        console.log("Current Product ID:", product._id);
+  
+        const isInWishlist = wishlistResponse.data.some((item) => {
+          const wishlistProductId = typeof item.product === "string" ? item.product : item.product._id;
+          console.log("Comparing", wishlistProductId, "===", product._id);
+          return wishlistProductId === product._id;
+        });
+  
+        setInWishlist(isInWishlist);
+        console.log("isInWishlist:", isInWishlist);
+      } catch (err) {
+        console.log("Error fetching wishlist info", err.message);
+      }
+    };
+  
+    fetchInitialData();
+  }, [product]);
+  
+  
+
+  const toggleWishlist = async () => {
+    try {
+      // Toggle state first
+      const newState = !inWishlist;
+      setInWishlist(newState);
+  
+      // Call the API
+      if (newState) {
+        await api.post('/wishlist/add-to-wishlist', {
+          userId,
+          product, // make sure `product` is defined properly
+        });
+      } else {
+        await api.post('/wishlist/remove-from-wishlist', {
+          userId,
+          product,
+        });
+      }
+  
+      // Show toast
+      Toast.fire({
+        icon: "success",
+        title: newState ? "Added to wishlist!" : "Removed from wishlist!",
+      });
+    } catch (err) {
+      console.error("Wishlist error:", err.message);
+      Toast.fire({
+        icon: "error",
+        title: "Failed to update wishlist",
+      });
+    }
   };
 
   return (
