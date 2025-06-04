@@ -254,6 +254,29 @@ export default function ProductPage() {
     }
   };
 
+
+  useEffect(() => {
+    const createRecentlyVP = async () => {
+      // Only proceed if we have both userId and a valid product with _id
+      if (!userId || !product || !product._id) {
+        console.log('Missing userId or product data, skipping recently viewed creation');
+        return;
+      }
+  
+      try {
+        const response = await api.post('/history/create-recently-viewed-products', { 
+          userId, 
+          product: product._id // Send only the product ID, not the entire product object
+        });
+        console.log('recentlyVP created successfully');
+      } catch (err) {
+        console.log('error creating recentlyVP', err?.message);
+      }
+    };
+  
+    createRecentlyVP();
+  }, [userId, product]);
+
   return (
     <div className="container mx-auto p-4">
       <div className="w-full grid grid-cols-2">
