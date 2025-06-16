@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { Request, Response, RequestHandler } from 'express';
 import { generateToken, verifyToken, JwtPayload } from '../utils/jwt.js';
 import mongoose from 'mongoose';
+import Inbox from '../models/Inbox.js';
 
 export const createUser: RequestHandler = async (req, res): Promise<void> => {
   try {
@@ -50,29 +51,39 @@ export const createUser: RequestHandler = async (req, res): Promise<void> => {
       // Verify address was created with a direct query
       const verifyAddress = await Address.findById(savedAddress._id);
       console.log("Address verification result:", verifyAddress ? "Found" : "Not found");
+
+      // Create inbox entry for registration
+      const newInbox = new Inbox({
+        user: newUser._id,
+        status: 'register',
+        message: `Welcome, ${username}! Your account has been created successfully.`,
+      });
+      const savedInbox = await newInbox.save();
+      console.log('Inbox entry saved successfully with ID:', savedInbox._id);
       
       // Response
       res.status(201).json({
-        message: 'User created with default address',
+        message: 'User created with default address and inbox entry',
         user: {
           id: newUser._id,
           username: newUser.username,
           email: newUser.email
         },
-        address: savedAddress
+        address: savedAddress,
+        inbox: savedInbox
       });
-    } catch (addressError: unknown) {
-      console.log("Error creating address:", addressError);
+    } catch (addressOrInboxError: unknown) {
+      console.log("Error creating address or inbox:", addressOrInboxError);
       
-      // Still respond with user created but note address error
+      // Still respond with user created but note address or inbox error
       res.status(201).json({
-        message: 'User created but address creation failed',
+        message: 'User created but address or inbox creation failed',
         user: {
           id: newUser._id,
           username: newUser.username,
           email: newUser.email
         },
-        addressError: addressError instanceof Error ? addressError.message : 'Unknown error'
+        addressOrInboxError: addressOrInboxError instanceof Error ? addressOrInboxError.message : 'Unknown error'
       });
     }
   } catch (error: unknown) {

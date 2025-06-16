@@ -1,7 +1,78 @@
+'use client';
+import { useEffect, useState } from "react";
 import SideBar from "../../../components/SideBar"
 import { Card, CardBody } from '@nextui-org/react';
+import api from "@/lib/api";
 
 export default function AccountIndex() {
+    const [inboxes, setInboxes] = useState([]);
+    const [userId, setUserId] = useState(null);
+    const [loader, setLoader] = useState(true);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+          try {
+            const token = localStorage.getItem('token');
+            if (!token) {
+              throw new Error('No token found, please log in');
+            }
+            
+            const response = await api.get('/users/me', {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            });
+            
+            console.log('user id in reviews page: ', response.data);
+            setUserId(response.data.id);
+          } catch (err) {
+            console.log('Error fetching user data:', err?.message);
+            return;
+          }
+        };
+        fetchUserData();
+      }, []);
+
+
+    useEffect(() => {
+    if (!userId) return;
+
+    const fetchInboxes = async () => {
+      try {
+        const response = await api.post('/get-inboxes', { userId });
+        console.log('inbox response: ', response.data.inboxes);
+
+        // No need to flat() since the backend now returns a flat array
+        const fetchedInboxes = (response.data.inboxes || []).flat();
+        setInboxes(fetchedInboxes);
+      } catch (err) {
+        console.log('error fetching inbox objects: ', err?.message);
+      } finally {
+        setLoader(false);
+      }
+    };
+    fetchInboxes();
+  }, [userId]);
+
+  function getTimeAgo(dateString) {
+    const now = new Date();
+    const past = new Date(dateString);
+    const diffInMs = now - past;
+    const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+    
+    if (diffInDays === 0) {
+      const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+      if (diffInHours === 0) {
+        const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+        return diffInMinutes <= 1 ? "à l'instant" : `il y a ${diffInMinutes} min`;
+      }
+      return diffInHours === 1 ? "il y a 1 heure" : `il y a ${diffInHours} heures`;
+    }
+    
+    return diffInDays === 1 ? "il y a 1 jour" : `il y a ${diffInDays} jours`;
+  }
+
     const messages = [
         {
           id: 1,
@@ -49,11 +120,11 @@ export default function AccountIndex() {
                     <h1 className="text-xl font-medium mb-6">Messages</h1>
                     
                     <div className="w-full space-y-4">
-                        {messages.map((message) => (
-                            <Card key={message.id} className="w-full">
+                        {inboxes.map((message) => (
+                            <Card key={message._id} className="w-full">
                             <CardBody className="p-4">
                                 <div className="flex justify-between items-start mb-2">
-                                <div className="text-sm text-gray-500">{message.timeAgo}</div>
+                                <div className="text-sm text-gray-500">{getTimeAgo(message?.createdAt)}</div>
                                 <div className="text-sm">
                                     <a href="#" className="text-blue-500 hover:underline">Détails</a>
                                 </div>
@@ -68,20 +139,12 @@ export default function AccountIndex() {
                                             message.status === 'confirmed' && 'text-green-600'
                                         }
                                     `}>
-                                    {message.statusTitle}
+                                    {message?.statusTitle}
                                     </span>
                                 </div>
-                                <p className="text-sm text-gray-600 mt-1">{message.content}</p>
+                                <p className="text-sm text-gray-600 mt-1">{message?.message}</p>
                                 </div>
 
-                                <div className="flex items-center gap-4 bg-gray-50 p-3 rounded-lg">
-                                <img
-                                    src={message.product.image}
-                                    alt={message.product.name}
-                                    className="w-20 h-20 object-cover rounded"
-                                />
-                                <div className="text-sm">{message.product.name}</div>
-                                </div>
                             </CardBody>
                             </Card>
                         ))}

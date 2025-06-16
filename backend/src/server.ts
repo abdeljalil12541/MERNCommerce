@@ -11,6 +11,7 @@ import orderRouter from './routes/orderRouter.js';
 import reviewRouter from './routes/reviewRouter.js';
 import wishlistRouter from './routes/wishlistRouter.js';
 import recentlyVPRouter from './routes/recentlyVPRouter.js';
+import inboxesRouter from './routes/inboxRouter.js';
 import User from './models/User.js';
 import { verifyToken, JwtPayload } from './utils/jwt.js';
 import Address from './models/Address.js';
@@ -117,6 +118,7 @@ app.use('/api/orders', orderRouter);
 app.use('/api/reviews', reviewRouter);
 app.use('/api/wishlist', wishlistRouter);
 app.use('/api/history', recentlyVPRouter);
+app.use('/api', inboxesRouter);
 console.log('User routes mounted at /api/users');
 
 app.get('/', (req: Request, res: Response) => {
