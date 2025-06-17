@@ -134,7 +134,7 @@ export default function EditAddress() {
               <CardHeader className="border-b border-gray-200">
                 <h2 className="text-lg font-semibold">Adresse</h2>
               </CardHeader>
-              <CardBody className="pb-16">
+              <CardBody className="pb-6">
                 {error && <p className="text-red-500">{error}</p>}
                 {!loading && !error && addressId && (
                   <form onSubmit={handleSubmit} className="relative h-full">
