@@ -151,7 +151,7 @@ export default function ProductPage() {
 
       if (isAuthenticated) {
         // For authenticated users, add to MongoDB via APIget
-        const response = await apiget.post('/cart/add', {
+        const response = await api.post('/cart/add', {
           productId: product._id,
           quantity: 1,
           selectedSize, // Pass selectedSize to the backend

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import SideBar from "../../../../components/SideBar";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
-import { CheckCircle, User, Bell, Info } from 'lucide-react';
+import { CheckCircle, User, Bell, Info, Package } from 'lucide-react';
 import api from "@/lib/api";
 
 export default function AccountIndex() {
@@ -114,6 +114,13 @@ export default function AccountIndex() {
           bgColor: 'bg-green-50',
           borderColor: 'border-green-200',
           label: 'Inscription'
+        },
+        orderUpcoming: {
+          icon: Package, // or Truck, ShoppingBag, Clock - choose based on your imports
+          color: 'text-yellow-600',
+          bgColor: 'bg-yellow-50',
+          borderColor: 'border-yellow-200',
+          label: 'Commande en cours'
         },
         notification: {
           icon: Bell,

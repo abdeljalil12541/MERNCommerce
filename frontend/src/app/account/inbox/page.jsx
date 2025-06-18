@@ -123,12 +123,13 @@ export default function AccountIndex() {
                                   <span className={`font-medium 
                                       ${
                                           inbox.status === 'register' && 'text-green-600' ||
-                                          inbox.status === 'canceled' && 'text-red-600' ||
+                                          inbox.status === 'orderUpcoming' && 'text-yellow-600' ||
                                           inbox.status === 'upcoming' && 'text-green-600' ||
                                           inbox.status === 'confirmed' && 'text-green-600'
                                       }
                                   `}>
                                   {inbox?.status === 'register' && 'Welcome to Kawaii! Start Shopping!'}
+                                  {inbox?.status === 'orderUpcoming' && 'Your order is on the way! 📦'}
                                   </span>
                               </div>
                               <p className="text-sm text-gray-600 mt-1">{inbox?.message}</p>

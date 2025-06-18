@@ -2,6 +2,7 @@ import { RequestHandler, Request } from "express";
 import mongoose from "mongoose";
 import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
+import Inbox from "../models/Inbox.js";
 
 export const createOrder: RequestHandler = async (req, res): Promise<void> => {
   const { userId, cartProducts, customerInfo, paymentMethod, totalPrice } = req.body;
@@ -30,10 +31,39 @@ export const createOrder: RequestHandler = async (req, res): Promise<void> => {
 
     await newOrder.save();
 
-    // Optionally delete cart(s)
-    await Cart.deleteMany({ userId });
+    try {
+      // Create inbox entry for order confirmation
+      const newInbox = new Inbox({
+        user: userId,
+        status: 'orderUpcoming',
+        message: `Your order #${String(newOrder._id).toUpperCase()} has been placed successfully! Total: $${totalPrice}`,
+      });
+      
+      const savedInbox = await newInbox.save();
+      console.log('Inbox entry saved successfully with ID:', savedInbox._id);
 
-    res.status(201).json({ success: true, orderId: newOrder._id, orderData: newOrder });
+      // Optionally delete cart(s)
+      await Cart.deleteMany({ userId });
+
+      res.status(201).json({ 
+        success: true, 
+        orderId: newOrder._id, 
+        orderData: newOrder,
+        inbox: savedInbox
+      });
+
+    } catch (inboxError: unknown) {
+      console.log("Error creating inbox entry:", inboxError);
+      
+      // Still respond with order created but note inbox error
+      res.status(201).json({ 
+        success: true, 
+        orderId: newOrder._id, 
+        orderData: newOrder,
+        inboxError: inboxError instanceof Error ? inboxError.message : 'Unknown error'
+      });
+    }
+
   } catch (err: any) {
     res.status(400).json({ message: err.message || 'Failed to create order' });
   }
