@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import Review from "../models/Review.js";
 import { AuthRequest } from "../middleware/auth.js";
+import Inbox from "../models/Inbox.js";
 
 export const createReview: RequestHandler = async (req: AuthRequest, res): Promise<void> => {
     const { userId, product, reviewCount, reviewTitle, reviewDescription, image } = req.body;
@@ -15,6 +16,16 @@ export const createReview: RequestHandler = async (req: AuthRequest, res): Promi
             image })
         await newReview.save();
         console.log("review created successfully with ID:", newReview._id);
+
+        const newInbox = new Inbox({
+            user: userId,
+            status: 'review',
+            message: `Your review (${reviewTitle}) on [${product.title}] has been added successfully!`,
+          });
+          
+        const savedInbox = await newInbox.save();
+        console.log('Inbox entry saved successfully with ID:', savedInbox._id);
+
         res.status(201).json({ message: "review created successfully", newReview: newReview })
     } catch (error: unknown) {
         console.log("Error creating address:", error);

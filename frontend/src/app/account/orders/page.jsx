@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Loader from '@/components/Loader';
 
 export default function AccountOrders() {
-    const [activeTab, setActiveTab] = useState('canceled');
+    const [activeTab, setActiveTab] = useState('current');
     const [userId, setUserId] = useState(null);
     const [orders, setOrders] = useState([]);
     const router = useRouter();

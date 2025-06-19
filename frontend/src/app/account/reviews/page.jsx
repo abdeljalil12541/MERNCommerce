@@ -7,6 +7,7 @@ import { CardContent } from "@mui/material";
 import dynamic from 'next/dynamic';
 import api from "@/lib/api";
 import Loader from "@/components/Loader";
+import Link from "next/link";
 
 const ReactStars = dynamic(() => import("react-stars"), { ssr: false });
 
@@ -88,9 +89,11 @@ useEffect(() => {
                       <p className="text-gray-600 mb-6 max-w-lg mx-auto">
                         Après la livraison de vos produits, vous pourrez les évaluer. Vos commentaires seront publiés sur la page produit pour aider tous les utilisateurs de Jumia à bénéficier de la meilleure expérience d'achat.
                       </p>
-                      <Button color="primary">
-                        Poursuivre vos achats
-                      </Button>
+                      <Link href={'/'}>
+                        <Button color="primary">
+                          Poursuivre vos achats
+                        </Button>
+                      </Link>
                     </div>
                   </div>
                   ):(

@@ -124,12 +124,14 @@ export default function AccountIndex() {
                                       ${
                                           inbox.status === 'register' && 'text-green-600' ||
                                           inbox.status === 'orderUpcoming' && 'text-yellow-600' ||
+                                          inbox.status === 'review' && 'text-purple-600' ||
                                           inbox.status === 'upcoming' && 'text-green-600' ||
                                           inbox.status === 'confirmed' && 'text-green-600'
                                       }
                                   `}>
-                                  {inbox?.status === 'register' && 'Welcome to Kawaii! Start Shopping!'}
+                                  {inbox?.status === 'register' && 'Welcome to Kawaii! Start Shopping! 🎉'}
                                   {inbox?.status === 'orderUpcoming' && 'Your order is on the way! 📦'}
+                                  {inbox?.status === 'review' && 'Your feedback is live! ✨'}
                                   </span>
                               </div>
                               <p className="text-sm text-gray-600 mt-1">{inbox?.message}</p>
