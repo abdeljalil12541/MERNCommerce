@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import SideBar from "../../../../components/SideBar";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
-import { CheckCircle, User, Bell, Info, Package, Star } from 'lucide-react';
+import { CheckCircle, User, Bell, Info, Package, Star, Shield } from 'lucide-react';
 import api from "@/lib/api";
 
 export default function AccountIndex() {
@@ -121,6 +121,20 @@ export default function AccountIndex() {
           bgColor: 'bg-yellow-50',
           borderColor: 'border-yellow-200',
           label: 'Commande en cours'
+        },
+        updatePersoInfos: {
+          icon: User,
+          color: 'text-blue-600',
+          bgColor: 'bg-blue-50',
+          borderColor: 'border-blue-200',
+          label: 'Profil mis à jour'
+        },
+        passwordChanged: {
+          icon: Shield,
+          color: 'text-red-600',
+          bgColor: 'bg-red-50',
+          borderColor: 'border-red-200',
+          label: 'Mot de passe mis à jour'
         },
         review: {
           icon: Star, // or MessageSquare, ThumbsUp, Edit3, MessageCircle

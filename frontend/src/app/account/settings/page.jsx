@@ -25,6 +25,7 @@ export default function ManageAccount() {
 
   const Toast = Swal.mixin({
     toast: true,
+    width: '400px',
     position: "bottom-end",
     showConfirmButton: false,
     timer: 3000,

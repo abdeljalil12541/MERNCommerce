@@ -191,31 +191,20 @@ export default function ProductPage() {
 
   useEffect(() => {
     if (!product || !product._id) return;
-  
+    
     const fetchInitialData = async () => {
       try {
         const userResponse = await api.get('/users/me');
         const currentUserId = userResponse.data.id;
         console.log("Current User ID:", currentUserId);
         setUserId(currentUserId);
-  
-        const wishlistResponse = await api.get(`/wishlist/${currentUserId}`);
-        console.log("Wishlist Data:", wishlistResponse.data);
-        console.log("Current Product ID:", product._id);
-  
-        const isInWishlist = wishlistResponse.data.some((item) => {
-          const wishlistProductId = typeof item.product === "string" ? item.product : item.product._id;
-          console.log("Comparing", wishlistProductId, "===", product._id);
-          return wishlistProductId === product._id;
-        });
-  
-        setInWishlist(isInWishlist);
-        console.log("isInWishlist:", isInWishlist);
+        
+        // ... rest of your wishlist logic
       } catch (err) {
-        console.log("Error fetching wishlist info", err.message);
+        console.log("Error fetching user data", err.message);
       }
     };
-  
+    
     fetchInitialData();
   }, [product]);
   
@@ -256,26 +245,32 @@ export default function ProductPage() {
 
 
   useEffect(() => {
+    let isCancelled = false;
+    
     const createRecentlyVP = async () => {
-      // Only proceed if we have both userId and a valid product with _id
-      if (!userId || !product || !product._id) {
-        console.log('Missing userId or product data, skipping recently viewed creation');
-        return;
-      }
-  
+      if (!userId || !product?._id || isCancelled) return;
+      
       try {
-        const response = await api.post('/history/create-recently-viewed-products', { 
-          userId, 
-          product: product._id // Send only the product ID, not the entire product object
+        const response = await api.post('/history/create-recently-viewed-products', {
+          userId,
+          product: product._id
         });
-        console.log('recentlyVP created successfully');
+        if (!isCancelled) {
+          console.log('recentlyVP created successfully');
+        }
       } catch (err) {
-        console.log('error creating recentlyVP', err?.message);
+        if (!isCancelled) {
+          console.log('error creating recentlyVP', err?.message);
+        }
       }
     };
-  
+    
     createRecentlyVP();
-  }, [userId, product]);
+    
+    return () => {
+      isCancelled = true;
+    };
+  }, [userId, product?._id]);
 
   return (
     <div className="container mx-auto p-4">

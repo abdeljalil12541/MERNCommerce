@@ -7,11 +7,14 @@ export const createRecentlyVP: RequestHandler = async (req: AuthRequest, res): P
     const { userId, product } = req.body;
 
     try {
-        // Check if a recently viewed product already exists for this product
-        const existingRecentlyVP = await recentlyViewedProducts.findOne({ product });
+        // Check if THIS USER has already viewed THIS PRODUCT
+        const existingRecentlyVP = await recentlyViewedProducts.findOne({ 
+            userId, 
+            product 
+        });
         
         if (existingRecentlyVP) {
-            // Product already exists in recently viewed, don't create a new one
+            // User already viewed this product, just return it
             res.status(200).json({ 
                 message: "Product already in recently viewed", 
                 recentlyVP: existingRecentlyVP 
@@ -19,7 +22,7 @@ export const createRecentlyVP: RequestHandler = async (req: AuthRequest, res): P
             return;
         }
 
-        // Product doesn't exist, create a new one
+        // Create new record for this user-product combination
         const newRecentlyVP = new recentlyViewedProducts({
             userId,
             product,

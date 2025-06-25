@@ -321,6 +321,16 @@ export const updateUserInfo : RequestHandler = async (req, res): Promise<void> =
     userInfo.email = email || userInfo.email;
 
     await userInfo.save();
+
+    const newInbox = new Inbox({
+      user: decoded.id, // Use the decoded user ID
+      status: 'updatePersoInfos', // Changed from 'review' to 'info' since this is about profile updates
+      message: `Your profile has been updated successfully!`,
+    });
+
+    const savedInbox = await newInbox.save();
+    console.log('Inbox entry saved successfully with ID:', savedInbox._id);
+
     res.status(200).json({ message: 'user info updated', userInfo });
   } catch (err) {
     res.status(500).json({ message: 'Error updating user info', err });
@@ -366,6 +376,22 @@ export const updatePassword: RequestHandler = async (req, res): Promise<void> =>
   const salt = await bcrypt.genSalt(10);
   user.password = await bcrypt.hash(newPassword, salt);
   await user.save();
+
+   // Create inbox notification for password update
+   try {
+    const newInbox = new Inbox({
+      user: decoded.id,
+      status: 'passwordChanged', // Different status for password updates
+      message: `Your password has been updated successfully! Your account is now more secure.`,
+    });
+
+    const savedInbox = await newInbox.save();
+    console.log('Password update inbox entry saved successfully with ID:', savedInbox._id);
+  } catch (inboxError) {
+    console.error('Error creating inbox notification for password update:', inboxError);
+    // Continue with the response since password update was successful
+  }
+
   res.status(200).json({ message: 'Password updated successfully' });
 };
 

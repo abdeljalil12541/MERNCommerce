@@ -125,13 +125,16 @@ export default function AccountIndex() {
                                           inbox.status === 'register' && 'text-green-600' ||
                                           inbox.status === 'orderUpcoming' && 'text-yellow-600' ||
                                           inbox.status === 'review' && 'text-purple-600' ||
-                                          inbox.status === 'upcoming' && 'text-green-600' ||
+                                          inbox.status === 'updatePersoInfos' && 'text-blue-600' ||
+                                          inbox.status === 'passwordChanged' && 'text-red-600' ||
                                           inbox.status === 'confirmed' && 'text-green-600'
                                       }
                                   `}>
                                   {inbox?.status === 'register' && 'Welcome to Kawaii! Start Shopping! 🎉'}
                                   {inbox?.status === 'orderUpcoming' && 'Your order is on the way! 📦'}
                                   {inbox?.status === 'review' && 'Your feedback is live! ✨'}
+                                  {inbox?.status === 'updatePersoInfos' && 'Profile updated successfully! 👤'}
+                                  {inbox?.status === 'passwordChanged' && 'Password updated securely! 🔒'}
                                   </span>
                               </div>
                               <p className="text-sm text-gray-600 mt-1">{inbox?.message}</p>
