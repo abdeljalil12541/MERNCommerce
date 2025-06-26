@@ -127,14 +127,18 @@ export default function AccountIndex() {
                                           inbox.status === 'review' && 'text-purple-600' ||
                                           inbox.status === 'updatePersoInfos' && 'text-blue-600' ||
                                           inbox.status === 'passwordChanged' && 'text-red-600' ||
+                                          inbox.status === 'updateAddress' && 'text-teal-600' ||
+                                          inbox.status === 'newsLetter' && 'text-orange-600' ||
                                           inbox.status === 'confirmed' && 'text-green-600'
                                       }
                                   `}>
-                                  {inbox?.status === 'register' && 'Welcome to Kawaii! Start Shopping! 🎉'}
-                                  {inbox?.status === 'orderUpcoming' && 'Your order is on the way! 📦'}
-                                  {inbox?.status === 'review' && 'Your feedback is live! ✨'}
-                                  {inbox?.status === 'updatePersoInfos' && 'Profile updated successfully! 👤'}
-                                  {inbox?.status === 'passwordChanged' && 'Password updated securely! 🔒'}
+                                    {inbox?.status === 'register' && 'Welcome to Kawaii! Start Shopping! 🎉'}
+                                    {inbox?.status === 'orderUpcoming' && 'Your order is on the way! 📦'}
+                                    {inbox?.status === 'review' && 'Your feedback is live! ✨'}
+                                    {inbox?.status === 'updatePersoInfos' && 'Profile updated successfully! 👤'}
+                                    {inbox?.status === 'updateAddress' && 'Address updated successfully! 📍'}
+                                    {inbox?.status === 'passwordChanged' && 'Password updated securely! 🔒'}
+                                    {inbox?.status === 'newsLetter' && 'Newsletter preferences updated! 📧'}
                                   </span>
                               </div>
                               <p className="text-sm text-gray-600 mt-1">{inbox?.message}</p>

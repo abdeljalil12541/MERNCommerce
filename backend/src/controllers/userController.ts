@@ -287,6 +287,21 @@ export const updateAddress: RequestHandler = async (req, res): Promise<void> => 
     address.phone = phone || address.phone;
 
     await address.save();
+
+    try {
+      const newInbox = new Inbox({
+        user: decoded.id,
+        status: 'updateAddress', // Different status for password updates
+        message: `Great! Your address has been updated.`,
+      });
+  
+      const savedInbox = await newInbox.save();
+      console.log('Address update inbox entry saved successfully with ID:', savedInbox._id);
+    } catch (inboxError) {
+      console.error('Error creating inbox notification for address update:', inboxError);
+      // Continue with the response since password update was successful
+    }
+
     res.status(200).json({ message: 'Address updated', address });
   } catch (error) {
     res.status(500).json({ message: 'Error updating address', error });
@@ -421,6 +436,21 @@ export const updateNewsLetterStatus: RequestHandler = async (req, res): Promise<
     }
 
     userNewsLetterStatus.newsLetter = newsLetter || userNewsLetterStatus.newsLetter;
+
+    try {
+      const subscriptionStatus = newsLetter ? 'subscribed to' : 'unsubscribed from';
+      const newInbox = new Inbox({
+        user: decoded.id,
+        status: 'newsLetter',
+        message: `You have successfully ${subscriptionStatus} our newsletter! 📧`,
+      });
+  
+      const savedInbox = await newInbox.save();
+      console.log('Newsletter update inbox entry saved successfully with ID:', savedInbox._id);
+    } catch (inboxError) {
+      console.error('Error creating inbox notification for newsletter update:', inboxError);
+      // Continue with the response since password update was successful
+    }
 
     await userNewsLetterStatus.save();
     res.status(200).json({ message: 'user status updated', userNewsLetterStatus });

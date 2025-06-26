@@ -11,7 +11,7 @@ type InboxStatus =
   | 'passwordChanged'
   | 'updatePersoInfos'
   | 'updateAddress'
-  | 'updateCommunicationPreferences';
+  | 'newsLetter';
 
 // Define the interface for the Inbox document
 interface IInbox extends Document {
@@ -36,7 +36,7 @@ const inboxSchema = new Schema<IInbox>(
         'passwordChanged',
         'updatePersoInfos',
         'updateAddress',
-        'updateCommunicationPreferences',
+        'newsLetter',
       ],
       required: true,
     },

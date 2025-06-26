@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import SideBar from "../../../../components/SideBar";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/Loader";
-import { CheckCircle, User, Bell, Info, Package, Star, Shield } from 'lucide-react';
+import { CheckCircle, User, Bell, Info, Package, Star, Shield, MapPin, Mail } from 'lucide-react';
 import api from "@/lib/api";
 
 export default function AccountIndex() {
@@ -115,6 +115,13 @@ export default function AccountIndex() {
           borderColor: 'border-green-200',
           label: 'Inscription'
         },
+        updateAddress: {
+          icon: MapPin,
+          color: 'text-teal-600',
+          bgColor: 'bg-teal-50',
+          borderColor: 'border-teal-200',
+          label: 'Adresse mise à jour'
+        },
         orderUpcoming: {
           icon: Package,
           color: 'text-yellow-600',
@@ -128,6 +135,13 @@ export default function AccountIndex() {
           bgColor: 'bg-blue-50',
           borderColor: 'border-blue-200',
           label: 'Profil mis à jour'
+        },
+        newsLetter: {
+          icon: Mail,
+          color: 'text-orange-600',
+          bgColor: 'bg-orange-50',
+          borderColor: 'border-orange-200',
+          label: 'Newsletter mise à jour'
         },
         passwordChanged: {
           icon: Shield,

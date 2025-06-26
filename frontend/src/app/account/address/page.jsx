@@ -26,6 +26,7 @@ export default function EditAddress() {
   const Toast = Swal.mixin({
     toast: true,
     position: "bottom-end",
+    width: "400px",
     showConfirmButton: false,
     timer: 3000,
     timerProgressBar: true,
